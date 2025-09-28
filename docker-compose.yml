@@ -1,0 +1,136 @@
+volumes:
+  db_data: null
+  search_data: null
+  persistent_data: null
+
+# Define common environment variables
+x-environment: &common-env
+  # general
+  APP_NAME: ${APP_NAME:-AppName}
+  APP_URL: ${APP_URL:-https://app.example.com}
+  # Sanctum
+  SANCTUM_STATEFUL_DOMAINS: ${SANCTUM_STATEFUL_DOMAINS:-''}
+  # session
+  SESSION_DRIVER: redis
+  SESSION_DOMAIN: ${SESSION_DOMAIN:-null}
+  SESSION_LIFETIME: ${SESSION_LIFETIME:-120}
+  # mysql
+  DB_CONNECTION: mysql
+  DB_HOST: db
+  DB_USERNAME: ${MYSQL_USERNAME:-app}
+  DB_PASSWORD: ${MYSQL_PASSWORD:-secret}
+  DB_DATABASE: ${MYSQL_DATABASE:-app}
+  # redis
+  REDIS_HOST: redis
+  # scout
+  MEILISEARCH_KEY: ${MEILISEARCH_KEY}
+  SCOUT_DRIVER: meilisearch
+  SCOUT_QUEUE: true
+  MEILISEARCH_HOST: http://search:7700
+  # mail
+  MAIL_MAILER: ${MAIL_MAILER:-log}
+  MAIL_SCHEME: ${MAIL_SCHEME:-null}
+  MAIL_HOST: ${MAIL_HOST:-null}
+  MAIL_PORT: ${MAIL_PORT:-null}
+  MAIL_USERNAME: ${MAIL_USERNAME:-null}
+  MAIL_PASSWORD: ${MAIL_PASSWORD:-null}
+  MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-null}
+  MAIL_FROM_NAME: ${MAIL_FROM_NAME:-'AppName'}
+  # time
+  TZ: ${TZ:-Europe/Berlin}
+  TIMEZONE: ${TZ:-Europe/Berlin}
+
+services:
+  app:
+    build:
+      context: app
+      target: app
+    restart: unless-stopped
+    ports:
+      - "8888:80"
+    environment:
+      <<: *common-env
+    volumes:
+      - "persistent_data:/app/storage"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      search:
+        condition: service_healthy
+    labels:
+      - caddy_0.tls=internal
+
+  queueworker:
+    build:
+      context: app
+      target: worker
+    command: php /app/artisan queue:work --timeout=${QUEUE_WORKER_TIMEOUT:-900} --sleep=3 --tries=3
+    restart: unless-stopped
+    environment:
+      <<: *common-env
+    volumes:
+      - "persistent_data:/app/storage"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      search:
+        condition: service_healthy
+
+  db:
+    image: mariadb:latest
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
+      MARIADB_DATABASE: ${MYSQL_DATABASE:-app}
+      MARIADB_USER: ${MYSQL_USERNAME:-app}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      TZ: ${TZ:-Europe/Berlin}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/init/mysql:/docker-entrypoint-initdb.d
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Europe/Berlin}
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  search:
+    image: getmeili/meilisearch:v1.14.0
+    restart: unless-stopped
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_KEY}
+      TZ: ${TZ:-Europe/Berlin}
+    volumes:
+      - search_data:/meili_data
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
