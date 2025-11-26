@@ -1,0 +1,52 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/php-mariadb
+{
+	"name": "Laravel Dev Container",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {},
+
+	// 8000 (Laravel), 3000 (Node), 3306 (MariaDB)
+	"forwardPorts": [8000, 3000, 3306],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "sudo chmod a+x \"$(pwd)\" && sudo rm -rf /var/www/html && sudo ln -s \"$(pwd)\" /var/www/html"
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"matthewpi.caddyfile-support",
+				"adam-watters.vscode-color-pick",
+				"kamikillerto.vscode-colorize",
+				"fabiospampinato.vscode-diff",
+				"github.vscode-github-actions",
+				"nhoizey.gremlins",
+				"zobo.php-intellisense",
+				"neilbrayfield.php-docblocker",
+				"mhutchie.git-graph",
+				"michelemelluso.gitignore",
+				"onecentlin.laravel-extension-pack",
+				"ctf0.vscode-laravel-gotos",
+				"mohamedbenhida.laravel-intellisense",
+				"ms-vsliveshare.vsliveshare",
+				"christian-kohler.path-intellisense",
+				"ctf0.php-array-symbols",
+				"mehedidracula.php-namespace-resolver",
+				"esbenp.prettier-vscode",
+				"davidsekar.redis-xplorer",
+				"bradlc.vscode-tailwindcss",
+				"gruntfuggly.todo-tree",
+				"mohamed-nouri.websocket-client",
+				"redhat.vscode-xml",
+				"redhat.vscode-yaml"
+			]
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

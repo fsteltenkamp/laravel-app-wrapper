@@ -1,0 +1,68 @@
+version: '3.8'
+
+volumes:
+  mariadb-data:
+  search_data:
+
+networks:
+  tnNet:
+
+services: 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sleep infinity # Overrides default command so things don't shut down after the process ends.
+    volumes:
+      - ../..:/workspaces:cached
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - tnNet
+
+  db:
+    image: mariadb:lts
+    restart: unless-stopped
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      MYSQL_ROOT_PASSWORD: mariadb
+      MYSQL_DATABASE: mariadb
+      MYSQL_USER: mariadb
+      MYSQL_PASSWORD: mariadb
+    networks:
+      - tnNet
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Berlin
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - tnNet
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  search:
+    image: getmeili/meilisearch:v1.14.0
+    restart: unless-stopped
+    expose:
+        - "7700"
+    environment:
+      MEILI_MASTER_KEY: secret
+      TZ: Europe/Berlin
+    volumes:
+      - search_data:/meili_data
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - tnNet
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
