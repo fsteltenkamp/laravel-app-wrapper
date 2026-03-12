@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Populate .env file from environment variables
+cat > /app/.env << EOF
+# App Config
+APP_LOCALE=de
+
+# MySQL Config:
+DB_CONNECTION=mariadb
+DB_HOST=db
+DB_PORT=3306
+
+APP_ENV=production
+APP_DEBUG=false
+
+LOG_CHANNEL=stack
+LOG_STACK=daily
+LOG_DEPRECATIONS_CHANNEL=null
+LOG_LEVEL=debug
+
+BROADCAST_DRIVER=redis
+CACHE_DRIVER=redis
+CACHE_PREFIX=lrvl_
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=redis
+SESSION_DRIVER=redis
+
+SCOUT_DRIVER=meilisearch
+SCOUT_QUEUE=true
+MEILISEARCH_HOST=search:7700
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PREFIX="lrvl_"
+
+MAIL_MAILER=smtp
+MAIL_HOST=changeme
+MAIL_PORT=465
+MAIL_USERNAME=changeme
+MAIL_ENCRYPTION=TLS
+MAIL_FROM_ADDRESS="changeme"
+MAIL_FROM_NAME="CHANGEME"
+
+SENTRY_SEND_DEFAULT_PII=true
+SENTRY_TRACES_SAMPLE_RATE=1.0
+
+# Extern gesetzt:
+APP_NAME=${APP_NAME}
+APP_URL=${APP_URL}
+APP_KEY=${APP_KEY}
+SESSION_DOMAIN=${SESSION_DOMAIN}
+SESSION_LIFETIME=${SESSION_LIFETIME}
+DB_USERNAME=${DB_USERNAME}
+DB_PASSWORD=${DB_PASSWORD}
+DB_DATABASE=${DB_DATABASE}
+REDIS_PASSWORD=${REDIS_PASSWORD:-null}
+QUEUE_WORKER_TIMEOUT=${QUEUE_WORKER_TIMEOUT}
+MEILISEARCH_KEY=${MEILISEARCH_KEY}
+SANCTUM_STATEFUL_DOMAINS=${SANCTUM_STATEFUL_DOMAINS}
+MAIL_PASSWORD=${MAIL_PASSWORD}
+TZ=${TZ}
+TIMEZONE=${TZ}
+APP_TIMEZONE=${TZ}
+EOF
+
+echo ".env file populated successfully"
+
+# Debug output - verify critical variables
+echo "=== Verifying critical variables ==="
+echo "APP_KEY: ${APP_KEY:0:20}..." # Only show first 20 chars for security
+echo "DB_CONNECTION: mariadb"
+echo "DB_HOST: db"
+echo "DB_DATABASE: ${DB_DATABASE}"
+echo "DB_USERNAME: ${DB_USERNAME}"
+echo "===================================="
