@@ -1,12 +1,12 @@
 #!/bin/bash
 
-BASE_TAG="ghcr.io/fsteltenkamp/laravel-app-wrapper"
+BASE_TAG="ghcr.io/CHANGEME/CHANGEME"
 APP_IMAGE_NAME="$BASE_TAG/app:testing"
 WORKER_IMAGE_NAME="$BASE_TAG/worker:testing"
 SCHEDULER_IMAGE_NAME="$BASE_TAG/scheduler:testing"
 
 echo "================================================"
-echo "          Entferne potentielle alte Container"
+echo "          Removing old containers and images"
 docker compose down
 COMPOSE_PROJECT_NAME=$(docker compose config | head -n 1)
 docker container rm ${COMPOSE_PROJECT_NAME}-queueworker-1
@@ -15,7 +15,7 @@ docker container rm ${COMPOSE_PROJECT_NAME}-redis-1
 docker container rm ${COMPOSE_PROJECT_NAME}-db-1
 docker container rm ${COMPOSE_PROJECT_NAME}-search-1
 
-read -p "Volumes Löschen? (y/n): " -n 1 -r
+read -p "Delete volumes? (y/n): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     docker volume rm ${COMPOSE_PROJECT_NAME}_db_data
@@ -32,19 +32,19 @@ docker volume prune -f
 docker container prune -f
 docker builder prune -f
 echo "==============================================="
-echo "          Container Bauen"
+echo "          Building Containers"
 docker build --target app -t $APP_IMAGE_NAME app/
 docker build --target worker -t $WORKER_IMAGE_NAME  app/
 docker build --target scheduler -t $SCHEDULER_IMAGE_NAME  app/
 echo "==============================================="
-echo "          Container Starten"
+echo "          Starting Containers"
 docker compose up
 
-read -p "Container hochladen? (y/n): " -n 1 -r
+read -p "Upload containers? (y/n): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "==============================================="
-    echo "          Container Hochladen"
+    echo "          Uploading Containers"
     APP_PUSH_OUTPUT=$(docker push $APP_IMAGE_NAME)
     WORKER_PUSH_OUTPUT=$(docker push $WORKER_IMAGE_NAME)
     SCHEDULER_PUSH_OUTPUT=$(docker push $SCHEDULER_IMAGE_NAME)
@@ -58,5 +58,5 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "Scheduler Digest: $SCHEDULER_SHA"
     echo "==============================================="
 else
-    echo "Container werden nicht hochgeladen."
+    echo "Containers not uploaded."
 fi

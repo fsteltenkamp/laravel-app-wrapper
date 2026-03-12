@@ -25,9 +25,9 @@ x-environment: &common-env
   # mail
   MAIL_PASSWORD: ${MAIL_PASSWORD:-null}
   # time
-  TZ: ${TZ:-Europe/Berlin}
-  TIMEZONE: ${TZ:-Europe/Berlin}
-  APP_TIMEZONE: ${TZ:-Europe/Berlin}
+  TZ: ${TZ:-UTC}
+  TIMEZONE: ${TZ:-UTC}
+  APP_TIMEZONE: ${TZ:-UTC}
   # Queue
   QUEUE_WORKER_TIMEOUT: ${QUEUE_WORKER_TIMEOUT}
 
