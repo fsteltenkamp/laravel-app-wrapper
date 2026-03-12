@@ -7,10 +7,11 @@ I am using Frankenphp as a base for the app image, but that can easily be change
 The setup process is pretty simple:  
 
 1. Put your laravel application into `app/src`
-2. Update all the names etc. in the following files:
+2. Update all names, urls, details etc. in the following files:
     - `app/Dockerfile`
-    - `app/deployment-scripts/laravel-init.sh`
+    - `app/deployment-scripts/shared/*`
     - `docker-compose.yml`
+    - `test.sh`
 3. If needed, put SQL init files into `docker/init/mysql`
 4. Update the Base-Path in `test.sh` to make sure the final containers are uploaded to your container registry.
 5. Use `test.sh` to check if the project runs correctly
