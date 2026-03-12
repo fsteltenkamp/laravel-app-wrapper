@@ -1,15 +1,27 @@
 FROM mcr.microsoft.com/devcontainers/php:1-8.3-bookworm
 
+# -----------------------------------------------------------------------------
+#  Fix yarn signature issue, open bug with microsoft images
+#   https://github.com/devcontainers/images/issues/1752
+# -----------------------------------------------------------------------------
+RUN curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg \
+  | sudo gpg \
+        --batch \
+        --yes \
+        --dearmor \
+        -o /usr/share/keyrings/yarn-archive-keyring.gpg
+
 # Install Debian Packages
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
         git \
+        gcc \
+        make \
         zip \
         unzip \
         libnss3-tools \
         gnupg \
         mariadb-client \
-        git-flow \
         build-essential \
         autoconf \
         pkg-config \
@@ -41,19 +53,25 @@ RUN docker-php-ext-install \
     intl \
     zip
 
-# Install redis extensions via PECL
-RUN pecl install redis xdebug && \
-    docker-php-ext-enable redis xdebug
-
 # Install Composer
 COPY --from=docker.io/composer:latest /usr/bin/composer /usr/local/bin/composer
 
-# PHP config
-RUN cp $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini && \
-    echo "\n[xdebug]\nxdebug.mode=disabled\nxdebug.start_with_request=yes\nxdebug.client_host=172.17.0.1\nxdebug.client_port=9000\n" >> $PHP_INI_DIR/php.ini
+# Install PIE: https://github.com/php/pie
+RUN curl -L --output /usr/bin/pie https://github.com/php/pie/releases/download/1.3.8/pie.phar && \
+    chmod +x /usr/bin/pie
 
-# Set up SSH Keys:
-COPY --chown=1000:1000 ssh/id_rsa /home/vscode/.ssh/id_rsa
-COPY --chown=1000:1000 ssh/id_rsa.pub /home/vscode/.ssh/id_rsa.pub
-RUN chmod -R 700 /home/vscode/.ssh
-RUN ssh-keyscan -t rsa github.com >> /home/vscode/.ssh/known_hosts
+# Copy php Config:
+RUN cp $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
+
+# Install redis extensions via PECL
+RUN pie install phpredis/phpredis && \
+    pie install xdebug/xdebug && \
+    docker-php-ext-enable redis xdebug
+
+# Configure XDEBUG
+RUN mkdir -p $PHP_INI_DIR/conf.d && \
+    echo "xdebug.mode=debug" >> $PHP_INI_DIR/conf.d/xdebug.ini && \
+    echo "xdebug.start_with_request=yes" >> $PHP_INI_DIR/conf.d/xdebug.ini && \
+    echo "xdebug.discover_client_host=1" >> $PHP_INI_DIR/conf.d/xdebug.ini && \
+    echo "xdebug.client_port=9003" >> $PHP_INI_DIR/conf.d/xdebug.ini && \
+    echo "xdebug.log=/tmp/xdebug.log" >> $PHP_INI_DIR/conf.d/xdebug.ini
