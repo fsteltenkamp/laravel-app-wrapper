@@ -42,7 +42,9 @@
 				"gruntfuggly.todo-tree",
 				"mohamed-nouri.websocket-client",
 				"redhat.vscode-xml",
-				"redhat.vscode-yaml"
+				"redhat.vscode-yaml",
+				// Remove if you don't want Copilot Chat
+				"GitHub.copilot-chat"
 			]
 		}
 	}
