@@ -1,59 +1,77 @@
 <x-layouts::auth :title="__('Log in')">
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
+    <x-fltc::form.container.auth.two-col-right :theme="$mainTheme">
+        <x-slot:side>
+            <div class="flex h-full flex-col">
+                <a href="#" class="flex items-center gap-2 font-semibold tracking-tight">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-{{ $mainTheme }}-500 text-white">
+                        <i class="ph ph-cube text-lg" aria-hidden="true"></i>
+                    </span>
+                    {{config('app.name')}}
+                </a>
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+                <div class="mt-auto">
+                    @php
+                        [$message, $author] = str(Illuminate\Foundation\Inspiring::quotes()->random())->explode('-');
+                    @endphp
+                    <blockquote class="text-lg font-medium leading-relaxed">
+                        &ldquo;{{ trim($message) }}&rdquo;
+                    </blockquote>
+                    <div class="mt-4 flex items-center gap-3">
+                        <span class="text-sm">
+                            <span class="block font-semibold">{{ trim($author) }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </x-slot:side>
 
-        <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6">
-            @csrf
+        <div>
+            <x-fltc::heading class="text-2xl font-bold tracking-tight">Welcome back</x-fltc::heading>
+            <x-fltc::subheading class="mt-1 text-sm">Sign in to continue to your dashboard.</x-fltc::subheading>
 
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                :label="__('Email address')"
-                :value="old('email')"
-                type="email"
-                required
-                autofocus
-                autocomplete="email"
-                placeholder="email@example.com"
-            />
+            <x-auth-session-status class="text-center" :status="session('status')" />
 
-            <!-- Password -->
-            <div class="relative">
-                <flux:input
-                    name="password"
-                    :label="__('Password')"
-                    type="password"
+            <form method="POST" action="{{ route('login.store') }}" class="mt-6">
+
+                <x-passkey-verify />
+
+                <x-fltc::form.input.email
+                    id="email"
+                    label="Email address"
+                    placeholder="you@example.com"
+                    icon="envelope"
+                    autocomplete="email"
+                    :theme="$mainTheme"
                     required
-                    autocomplete="current-password"
-                    :placeholder="__('Password')"
-                    viewable
+                    autofocus
                 />
 
-                @if (Route::has('password.request'))
-                    <flux:link class="absolute top-0 text-sm end-0" :href="route('password.request')" wire:navigate>
-                        {{ __('Forgot your password?') }}
-                    </flux:link>
-                @endif
-            </div>
+                <x-fltc::form.input.password
+                    id="password"
+                    label="Password"
+                    placeholder="••••••••"
+                    icon="lock"
+                    autocomplete="current-password"
+                    :theme="$mainTheme"
+                    required
+                />
 
-            <!-- Remember Me -->
-            <flux:checkbox name="remember" :label="__('Remember me')" :checked="old('remember')" />
+                <div class="mb-4 flex items-center justify-between">
+                    <x-fltc::form.checkbox id="remember" label="Remember me" :theme="$mainTheme" :bordered="false" class="px-0!" />
+                    @if (Route::has('password.request'))
+                        <a href="{{route('password.request')}}" class="text-sm font-medium text-{{ $mainTheme }}-600 hover:underline dark:text-{{ $mainTheme }}-400">Forgot password?</a>
+                    @endif
+                </div>
 
-            <div class="flex items-center justify-end">
-                <flux:button variant="primary" type="submit" class="w-full" data-test="login-button">
-                    {{ __('Log in') }}
-                </flux:button>
-            </div>
-        </form>
+                <x-fltc::button :theme="$mainTheme" width="full" type="submit">Sign in</x-fltc::button>
+            </form>
 
-        @if (Route::has('register'))
-            <div class="space-x-1 text-sm text-center rtl:space-x-reverse text-zinc-600 dark:text-zinc-400">
-                <span>{{ __('Don\'t have an account?') }}</span>
-                <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
-            </div>
-        @endif
-    </div>
+            @if (Route::has('auth.register'))
+                <p class="mt-6 text-sm opacity-70">
+                    Don't have an account?
+                    <a href="{{route('auth.register')}}" class="font-medium text-{{ $mainTheme }}-600 hover:underline dark:text-{{ $mainTheme }}-400">Create one</a>
+                </p>
+            @endif
+        </div>
+    </x-fltc::form.container.auth.two-col-right>
 </x-layouts::auth>

@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+Route::view('/', 'auth.login')->name('home');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::view('dashboard', 'dashboard')->name('dashboard');
+});
+
 require __DIR__.'/settings.php';
-require __DIR__.'/public.php';
 require __DIR__.'/admin.php';

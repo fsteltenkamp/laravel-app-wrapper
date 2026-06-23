@@ -1,52 +1,55 @@
 <x-layouts::auth :title="__('Reset password')">
-    <div class="flex flex-col gap-6">
-        <x-auth-header :title="__('Reset password')" :description="__('Please enter your new password below')" />
+    <div class="mx-auto w-full max-w-md">
+        <x-fltc::form.container.auth.simple :theme="$mainTheme">
+            <div class="flex flex-col gap-6 p-8">
+                <x-auth-header :title="__('Reset password')" :description="__('Please enter your new password below')" />
 
-        <!-- Session Status -->
-        <x-auth-session-status class="text-center" :status="session('status')" />
+                <!-- Session Status -->
+                <x-auth-session-status class="text-center" :status="session('status')" />
 
-        <form method="POST" action="{{ route('password.update') }}" class="flex flex-col gap-6">
-            @csrf
-            <!-- Token -->
-            <input type="hidden" name="token" value="{{ request()->route('token') }}">
+                <form method="POST" action="{{ route('password.update') }}" class="flex flex-col gap-6">
+                    @csrf
+                    <!-- Token -->
+                    <input type="hidden" name="token" value="{{ request()->route('token') }}">
 
-            <!-- Email Address -->
-            <flux:input
-                name="email"
-                value="{{ request('email') }}"
-                :label="__('Email')"
-                type="email"
-                required
-                autocomplete="email"
-            />
+                    <!-- Email Address -->
+                    <x-fltc::form.input.email
+                        name="email"
+                        :value="request('email')"
+                        :label="__('Email')"
+                        icon="envelope"
+                        :theme="$mainTheme"
+                        required
+                        autocomplete="email"
+                    />
 
-            <!-- Password -->
-            <flux:input
-                name="password"
-                :label="__('Password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="__('Password')"
-                viewable
-            />
+                    <!-- Password -->
+                    <x-fltc::form.input.password
+                        name="password"
+                        :label="__('Password')"
+                        :placeholder="__('Password')"
+                        icon="lock"
+                        :theme="$mainTheme"
+                        required
+                        autocomplete="new-password"
+                    />
 
-            <!-- Confirm Password -->
-            <flux:input
-                name="password_confirmation"
-                :label="__('Confirm password')"
-                type="password"
-                required
-                autocomplete="new-password"
-                :placeholder="__('Confirm password')"
-                viewable
-            />
+                    <!-- Confirm Password -->
+                    <x-fltc::form.input.password
+                        name="password_confirmation"
+                        :label="__('Confirm password')"
+                        :placeholder="__('Confirm password')"
+                        icon="lock"
+                        :theme="$mainTheme"
+                        required
+                        autocomplete="new-password"
+                    />
 
-            <div class="flex items-center justify-end">
-                <flux:button type="submit" variant="primary" class="w-full" data-test="reset-password-button">
-                    {{ __('Reset password') }}
-                </flux:button>
+                    <x-fltc::button :theme="$mainTheme" width="full" type="submit" data-test="reset-password-button">
+                        {{ __('Reset password') }}
+                    </x-fltc::button>
+                </form>
             </div>
-        </form>
+        </x-fltc::form.container.auth.simple>
     </div>
 </x-layouts::auth>

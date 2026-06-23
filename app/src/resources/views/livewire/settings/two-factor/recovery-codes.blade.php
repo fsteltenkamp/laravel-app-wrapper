@@ -5,49 +5,50 @@
 >
     <div class="px-6 space-y-2">
         <div class="flex items-center gap-2">
-            <flux:icon.lock-closed variant="outline" class="size-4"/>
-            <flux:heading size="lg" level="3">{{ __('2FA recovery codes') }}</flux:heading>
+            <x-fltc::icon name="lock" variant="regular" class="size-4" />
+            <x-fltc::heading size="lg" level="3">{{ __('2FA recovery codes') }}</x-fltc::heading>
         </div>
-        <flux:text variant="subtle">
+        <x-fltc::subheading>
             {{ __('Recovery codes let you regain access if you lose your 2FA device. Store them in a secure password manager.') }}
-        </flux:text>
+        </x-fltc::subheading>
     </div>
 
     <div class="px-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <flux:button
+            <x-fltc::button
                 x-show="!showRecoveryCodes"
                 icon="eye"
-                icon:variant="outline"
-                variant="primary"
+                icon-variant="regular"
+                :theme="$mainTheme"
                 @click="showRecoveryCodes = true;"
                 aria-expanded="false"
                 aria-controls="recovery-codes-section"
             >
                 {{ __('View recovery codes') }}
-            </flux:button>
+            </x-fltc::button>
 
-            <flux:button
+            <x-fltc::button
                 x-show="showRecoveryCodes"
                 icon="eye-slash"
-                icon:variant="outline"
-                variant="primary"
+                icon-variant="regular"
+                :theme="$mainTheme"
                 @click="showRecoveryCodes = false"
                 aria-expanded="true"
                 aria-controls="recovery-codes-section"
             >
                 {{ __('Hide recovery codes') }}
-            </flux:button>
+            </x-fltc::button>
 
             @if (filled($recoveryCodes))
-                <flux:button
+                <x-fltc::button
                     x-show="showRecoveryCodes"
-                    icon="arrow-path"
-                    variant="filled"
+                    icon="arrows-clockwise"
+                    variant="outline"
+                    theme="zinc"
                     wire:click="regenerateRecoveryCodes"
                 >
                     {{ __('Regenerate codes') }}
-                </flux:button>
+                </x-fltc::button>
             @endif
         </div>
 
@@ -60,7 +61,9 @@
         >
             <div class="mt-3 space-y-3">
                 @error('recoveryCodes')
-                    <flux:callout variant="danger" icon="x-circle" heading="{{$message}}"/>
+                    <x-fltc::alert theme="red">
+                        <x-fltc::icon name="x-circle" after="2" />{{ $message }}
+                    </x-fltc::alert>
                 @enderror
 
                 @if (filled($recoveryCodes))
@@ -79,9 +82,9 @@
                             </div>
                         @endforeach
                     </div>
-                    <flux:text variant="subtle" class="text-xs">
+                    <p class="text-xs text-zinc-500 dark:text-zinc-400">
                         {{ __('Each recovery code can be used once to access your account and will be removed after use. If you need more, click Regenerate codes above.') }}
-                    </flux:text>
+                    </p>
                 @endif
             </div>
         </div>

@@ -1,91 +1,77 @@
 <section class="w-full">
     @include('partials.settings-heading')
 
-    <flux:heading class="sr-only">{{ __('Security settings') }}</flux:heading>
+    <x-fltc::heading level="2" class="sr-only">{{ __('Security settings') }}</x-fltc::heading>
 
     <x-settings.layout :heading="__('Update password')" :subheading="__('Ensure your account is using a long, random password to stay secure')">
         <form method="POST" wire:submit="updatePassword" class="mt-6 space-y-6">
-            <flux:input
-                wire:model="current_password"
+            <x-fltc::form.input.password
+                model="current_password"
                 :label="__('Current password')"
-                type="password"
+                :theme="$mainTheme"
                 required
                 autocomplete="current-password"
-                viewable
             />
-            <flux:input
-                wire:model="password"
+            <x-fltc::form.input.password
+                model="password"
                 :label="__('New password')"
-                type="password"
+                :theme="$mainTheme"
                 required
                 autocomplete="new-password"
-                viewable
             />
-            <flux:input
-                wire:model="password_confirmation"
+            <x-fltc::form.input.password
+                model="password_confirmation"
                 :label="__('Confirm password')"
-                type="password"
+                :theme="$mainTheme"
                 required
                 autocomplete="new-password"
-                viewable
             />
 
             <div class="flex items-center gap-4">
-                <div class="flex items-center justify-end">
-                    <flux:button variant="primary" type="submit" class="w-full" data-test="update-password-button">{{ __('Save') }}</flux:button>
-                </div>
-
-                <x-action-message class="me-3" on="password-updated">
-                    {{ __('Saved.') }}
-                </x-action-message>
+                <x-fltc::button :theme="$mainTheme" type="submit" data-test="update-password-button">{{ __('Save') }}</x-fltc::button>
             </div>
         </form>
 
         @if ($canManageTwoFactor)
             <section class="mt-12">
-                <flux:heading>{{ __('Two-factor authentication') }}</flux:heading>
-                <flux:subheading>{{ __('Manage your two-factor authentication settings') }}</flux:subheading>
+                <x-fltc::heading level="2">{{ __('Two-factor authentication') }}</x-fltc::heading>
+                <x-fltc::subheading>{{ __('Manage your two-factor authentication settings') }}</x-fltc::subheading>
 
-                <div class="flex flex-col w-full mx-auto space-y-6 text-sm" wire:cloak>
+                <div class="flex flex-col w-full mx-auto space-y-6 text-sm mt-6" wire:cloak>
                     @if ($twoFactorEnabled)
                         <div class="space-y-4">
-                            <flux:text>
+                            <p class="text-sm text-zinc-600 dark:text-zinc-300">
                                 {{ __('You will be prompted for a secure, random pin during login, which you can retrieve from the TOTP-supported application on your phone.') }}
-                            </flux:text>
+                            </p>
 
                             <div class="flex justify-start">
-                                <flux:button
-                                    variant="danger"
-                                    wire:click="disable"
-                                >
+                                <x-fltc::button theme="red" wire:click="disable">
                                     {{ __('Disable 2FA') }}
-                                </flux:button>
+                                </x-fltc::button>
                             </div>
 
-                            <livewire:settings.two-factor.recovery-codes :$requiresConfirmation/>
+                            <livewire:settings.two-factor.recovery-codes :$requiresConfirmation />
                         </div>
                     @else
                         <div class="space-y-4">
-                            <flux:text variant="subtle">
+                            <p class="text-sm text-zinc-500 dark:text-zinc-400">
                                 {{ __('When you enable two-factor authentication, you will be prompted for a secure pin during login. This pin can be retrieved from a TOTP-supported application on your phone.') }}
-                            </flux:text>
+                            </p>
 
-                            <flux:button
-                                variant="primary"
-                                wire:click="enable"
-                            >
+                            <x-fltc::button :theme="$mainTheme" wire:click="enable">
                                 {{ __('Enable 2FA') }}
-                            </flux:button>
+                            </x-fltc::button>
                         </div>
                     @endif
                 </div>
             </section>
+        @endif
 
-            <flux:modal
-                name="two-factor-setup-modal"
-                class="max-w-md md:min-w-md"
-                @close="closeModal"
+        @if ($canManageTwoFactor)
+            <x-fltc::modal
                 wire:model="showModal"
+                @close="$wire.closeModal()"
+                max-width="md"
             >
                 <div class="space-y-6">
                     <div class="flex flex-col items-center space-y-4">
@@ -103,65 +89,67 @@
                                     @endfor
                                 </div>
 
-                                <flux:icon.qr-code class="relative z-20 dark:text-accent-foreground"/>
+                                <x-fltc::icon name="qr-code" size="xl" class="relative z-20 text-stone-900" />
                             </div>
                         </div>
 
                         <div class="space-y-2 text-center">
-                            <flux:heading size="lg">{{ $this->modalConfig['title'] }}</flux:heading>
-                            <flux:text>{{ $this->modalConfig['description'] }}</flux:text>
+                            <x-fltc::heading level="2" size="lg">{{ $this->modalConfig['title'] }}</x-fltc::heading>
+                            <x-fltc::subheading>{{ $this->modalConfig['description'] }}</x-fltc::subheading>
                         </div>
                     </div>
 
                     @if ($showVerificationStep)
                         <div class="space-y-6">
-                            <div class="flex flex-col items-center space-y-3 justify-center">
-                                <flux:otp
+                            <div
+                                class="flex flex-col items-center space-y-3 justify-center"
+                                x-data
+                                x-init="$nextTick(() => $el.querySelector('input')?.focus())"
+                            >
+                                <x-fltc::form.otp
                                     name="code"
-                                    wire:model="code"
+                                    wire:model.live="code"
                                     length="6"
-                                    label="OTP Code"
-                                    label:sr-only
-                                    class="mx-auto"
+                                    :theme="$mainTheme"
                                 />
                             </div>
 
                             <div class="flex items-center space-x-3">
-                                <flux:button
+                                <x-fltc::button
                                     variant="outline"
+                                    theme="zinc"
                                     class="flex-1"
                                     wire:click="resetVerification"
                                 >
                                     {{ __('Back') }}
-                                </flux:button>
+                                </x-fltc::button>
 
-                                <flux:button
-                                    variant="primary"
+                                <x-fltc::button
+                                    :theme="$mainTheme"
                                     class="flex-1"
                                     wire:click="confirmTwoFactor"
                                     x-bind:disabled="$wire.code.length < 6"
                                 >
                                     {{ __('Confirm') }}
-                                </flux:button>
+                                </x-fltc::button>
                             </div>
                         </div>
                     @else
                         @error('setupData')
-                            <flux:callout variant="danger" icon="x-circle" heading="{{ $message }}"/>
+                            <x-fltc::alert theme="red">
+                                <x-fltc::icon name="x-circle" after="2" />{{ $message }}
+                            </x-fltc::alert>
                         @enderror
 
                         <div class="flex justify-center">
                             <div class="relative w-64 overflow-hidden border rounded-lg border-stone-200 dark:border-stone-700 aspect-square">
                                 @empty($qrCodeSvg)
                                     <div class="absolute inset-0 flex items-center justify-center bg-white dark:bg-stone-700 animate-pulse">
-                                        <flux:icon.loading/>
+                                        <x-fltc::icon name="spinner" class="animate-spin" size="xl" />
                                     </div>
                                 @else
-                                <div x-data class="flex items-center justify-center h-full p-4">
-                                    <div
-                                        class="bg-white p-3 rounded"
-                                        :style="($flux.appearance === 'dark' || ($flux.appearance === 'system' && $flux.dark)) ? 'filter: invert(1) brightness(1.5)' : ''"
-                                    >
+                                    <div class="flex items-center justify-center h-full p-4">
+                                        <div class="bg-white p-3 rounded">
                                             {!! $qrCodeSvg !!}
                                         </div>
                                     </div>
@@ -170,20 +158,20 @@
                         </div>
 
                         <div>
-                            <flux:button
+                            <x-fltc::button
                                 :disabled="$errors->has('setupData')"
-                                variant="primary"
-                                class="w-full"
+                                :theme="$mainTheme"
+                                width="full"
                                 wire:click="showVerificationIfNecessary"
                             >
                                 {{ $this->modalConfig['buttonText'] }}
-                            </flux:button>
+                            </x-fltc::button>
                         </div>
 
                         <div class="space-y-4">
                             <div class="relative flex items-center justify-center w-full">
                                 <div class="absolute inset-0 w-full h-px top-1/2 bg-stone-200 dark:bg-stone-600"></div>
-                                <span class="relative px-2 text-sm bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-400">
+                                <span class="relative px-2 text-sm bg-white dark:bg-zinc-900 text-stone-600 dark:text-stone-400">
                                     {{ __('or, enter the code manually') }}
                                 </span>
                             </div>
@@ -206,7 +194,7 @@
                                 <div class="flex items-stretch w-full border rounded-xl dark:border-stone-700">
                                     @empty($manualSetupKey)
                                         <div class="flex items-center justify-center w-full p-3 bg-stone-100 dark:bg-stone-700">
-                                            <flux:icon.loading variant="mini"/>
+                                            <x-fltc::icon name="spinner" class="animate-spin" />
                                         </div>
                                     @else
                                         <input
@@ -217,15 +205,12 @@
                                         />
 
                                         <button
+                                            type="button"
                                             @click="copy()"
                                             class="px-3 transition-colors border-l cursor-pointer border-stone-200 dark:border-stone-600"
                                         >
-                                            <flux:icon.document-duplicate x-show="!copied" variant="outline"></flux:icon>
-                                            <flux:icon.check
-                                                x-show="copied"
-                                                variant="solid"
-                                                class="text-green-500"
-                                            ></flux:icon>
+                                            <x-fltc::icon name="copy" variant="regular" x-show="!copied" />
+                                            <x-fltc::icon name="check" x-show="copied" x-cloak class="text-green-500" />
                                         </button>
                                     @endempty
                                 </div>
@@ -233,7 +218,86 @@
                         </div>
                     @endif
                 </div>
-            </flux:modal>
+            </x-fltc::modal>
+        @endif
+
+        @if ($canManagePasskeys)
+            <section class="mt-12">
+                <x-fltc::heading level="2">{{ __('Passkeys') }}</x-fltc::heading>
+                <x-fltc::subheading>{{ __('Manage your passkeys for passwordless sign-in') }}</x-fltc::subheading>
+
+                <div class="mt-6 flex flex-col w-full mx-auto space-y-6 text-sm" wire:cloak>
+                    <div class="border rounded-lg border-zinc-200 dark:border-zinc-700 overflow-hidden">
+                        @forelse ($passkeys as $passkey)
+                            <div class="flex items-center justify-between p-4 {{ ! $loop->last ? 'border-b border-zinc-200 dark:border-zinc-700' : '' }}">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 dark:bg-zinc-800">
+                                        <x-fltc::icon name="key" size="lg" class="text-zinc-500 dark:text-zinc-400" />
+                                    </div>
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2.5">
+                                            <p class="font-medium tracking-tight">{{ $passkey['name'] }}</p>
+                                            @if ($passkey['authenticator'])
+                                                <x-fltc::badge :theme="$mainTheme">{{ $passkey['authenticator'] }}</x-fltc::badge>
+                                            @endif
+                                        </div>
+                                        <p class="text-zinc-500 dark:text-zinc-400 text-xs">
+                                            {{ __('Added :time', ['time' => $passkey['created_at_diff']]) }}
+                                            @if ($passkey['last_used_at_diff'])
+                                                <span class="opacity-50 mx-1">/</span>
+                                                {{ __('Last used :time', ['time' => $passkey['last_used_at_diff']]) }}
+                                            @endif
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <x-fltc::button
+                                    variant="outline"
+                                    theme="red"
+                                    height="sm"
+                                    icon="trash"
+                                    icon-variant="regular"
+                                    wire:click="confirmDelete({{ $passkey['id'] }})"
+                                />
+                            </div>
+                        @empty
+                            <div class="p-8 text-center">
+                                <div class="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-800">
+                                    <x-fltc::icon name="key" size="2xl" class="text-zinc-400 dark:text-zinc-500" />
+                                </div>
+                                <p class="font-medium">{{ __('No passkeys yet') }}</p>
+                                <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{{ __('Add a passkey to sign in without a password') }}</p>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <x-passkey-registration />
+                </div>
+            </section>
         @endif
     </x-settings.layout>
+
+    <x-fltc::modal
+        wire:model="showDeleteModal"
+        @close="$wire.closeDeleteModal()"
+        max-width="md"
+    >
+        <div class="space-y-6">
+            <div class="space-y-2">
+                <x-fltc::heading level="2" size="lg">{{ __('Remove passkey') }}</x-fltc::heading>
+                <x-fltc::subheading>
+                    {{ __('Are you sure you want to remove the passkey ":name"? You will no longer be able to use it to sign in.', ['name' => $deletingPasskeyName]) }}
+                </x-fltc::subheading>
+            </div>
+
+            <div class="flex gap-3 justify-end">
+                <x-fltc::button variant="outline" theme="zinc" wire:click="closeDeleteModal">
+                    {{ __('Cancel') }}
+                </x-fltc::button>
+                <x-fltc::button theme="red" wire:click="deletePasskey">
+                    {{ __('Remove passkey') }}
+                </x-fltc::button>
+            </div>
+        </div>
+    </x-fltc::modal>
 </section>

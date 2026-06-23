@@ -1,5 +1,0 @@
-<?php
-
-use Illuminate\Support\Facades\Route;
-
-Route::view('/', 'public.home')->name('home');
