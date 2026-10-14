@@ -2,20 +2,23 @@
 
 namespace App\Livewire\Admin\Users;
 
+use App\Livewire\Concerns\ShowsToasts;
+use App\Models\Permission;
 use App\Models\Team;
 use App\Models\User;
-use Flux\Flux;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use App\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 #[Title('Edit user')]
 class Edit extends Component
 {
+    use ShowsToasts;
+
     public User $user;
 
     public string $name = '';
@@ -85,7 +88,7 @@ class Edit extends Component
 
         $this->user->update($validated);
 
-        Flux::toast(variant: 'success', text: __('Profile updated.'));
+        $this->toast(__('Profile updated.'));
     }
 
     public function saveRoles(): void
@@ -96,7 +99,7 @@ class Edit extends Component
 
         $this->user->syncRoles($this->selectedRoles);
 
-        Flux::toast(variant: 'success', text: __('Permission groups updated.'));
+        $this->toast(__('Permission groups updated.'));
     }
 
     public function savePermissions(): void
@@ -107,7 +110,7 @@ class Edit extends Component
 
         $this->user->syncPermissions($this->selectedPermissions);
 
-        Flux::toast(variant: 'success', text: __('Direct permissions updated.'));
+        $this->toast(__('Direct permissions updated.'));
     }
 
     public function saveTeams(): void
@@ -122,7 +125,7 @@ class Edit extends Component
             $this->loadAssignments();
         }
 
-        Flux::toast(variant: 'success', text: __('Team membership updated.'));
+        $this->toast(__('Team membership updated.'));
     }
 
     public function render(): View
@@ -130,7 +133,9 @@ class Edit extends Component
         $this->applyTeamContext();
 
         $permissionSources = [];
-        foreach ($this->user->roles as $role) {
+        /** @var Collection<int, Role> $roles */
+        $roles = $this->user->roles;
+        foreach ($roles as $role) {
             foreach ($role->permissions as $perm) {
                 $permissionSources[$perm->name][] = $role->name;
             }

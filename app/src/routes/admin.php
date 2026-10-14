@@ -14,12 +14,12 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::livewire('users', UsersIndex::class)->middleware('can:manage-users')->name('admin.users.index');
     Route::livewire('users/{user}/edit', UsersEdit::class)->middleware('can:user.edit')->name('admin.users.edit');
 
-    Route::livewire('roles', RolesIndex::class)->name('admin.roles.index');
-    Route::livewire('roles/{role}/edit', RolesEdit::class)->name('admin.roles.edit');
+    Route::livewire('roles', RolesIndex::class)->middleware('can:manage-users')->name('admin.roles.index');
+    Route::livewire('roles/{role}/edit', RolesEdit::class)->middleware('can:manage-users')->name('admin.roles.edit');
 
-    Route::livewire('permissions', PermissionsIndex::class)->name('admin.permissions.index');
-    Route::livewire('permissions/{permission}/edit', PermissionsEdit::class)->name('admin.permissions.edit');
+    Route::livewire('permissions', PermissionsIndex::class)->middleware('can:manage-users')->name('admin.permissions.index');
+    Route::livewire('permissions/{permission}/edit', PermissionsEdit::class)->middleware('can:manage-users')->name('admin.permissions.edit');
 
-    Route::livewire('teams', TeamsIndex::class)->name('admin.teams.index');
-    Route::livewire('teams/{team}/edit', TeamsEdit::class)->name('admin.teams.edit');
+    Route::livewire('teams', TeamsIndex::class)->middleware('can:manage-users')->name('admin.teams.index');
+    Route::livewire('teams/{team}/edit', TeamsEdit::class)->middleware('can:manage-users')->name('admin.teams.edit');
 });

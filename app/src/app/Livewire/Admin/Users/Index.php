@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin\Users;
 
+use App\Livewire\Concerns\ShowsToasts;
 use App\Models\User;
-use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +16,7 @@ use Livewire\WithPagination;
 #[Title('User management')]
 class Index extends Component
 {
+    use ShowsToasts;
     use WithPagination;
 
     #[Url(as: 'q')]
@@ -41,18 +42,18 @@ class Index extends Component
         $this->authorize('user.create');
 
         $this->validate([
-            'newName'     => ['required', 'string', 'max:255'],
-            'newEmail'    => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')],
+            'newName' => ['required', 'string', 'max:255'],
+            'newEmail' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')],
             'newPassword' => ['required', 'string', 'min:8'],
         ]);
 
         User::create([
-            'name'     => $this->newName,
-            'email'    => $this->newEmail,
+            'name' => $this->newName,
+            'email' => $this->newEmail,
             'password' => Hash::make($this->newPassword),
         ]);
 
-        Flux::toast(variant: 'success', text: __('User created.'));
+        $this->toast(__('User created.'));
 
         $this->dispatch('close-modal', name: 'user-form');
     }
@@ -78,7 +79,7 @@ class Index extends Component
         if ($user && $user->isNot(Auth::user())) {
             $user->delete();
 
-            Flux::toast(variant: 'success', text: __('User deleted.'));
+            $this->toast(__('User deleted.'));
         }
 
         $this->confirmingDeleteId = null;

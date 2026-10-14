@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Livewire\Admin\Permissions\Edit;
 use App\Livewire\Admin\Permissions\Index;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\View;
 use Livewire\Livewire;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -19,16 +19,6 @@ class PermissionsTest extends TestCase
     {
         parent::setUp();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        View::share([
-            'mainTheme' => 'neutral',
-            'secondaryTheme' => 'slate',
-            'accentTheme' => 'sky',
-            'infoTheme' => 'blue',
-            'successTheme' => 'green',
-            'warningTheme' => 'yellow',
-            'errorTheme' => 'red',
-            'darkmode' => false,
-        ]);
     }
 
     public function test_permissions_index_requires_authentication(): void
@@ -37,9 +27,16 @@ class PermissionsTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
+    public function test_permissions_index_requires_permission(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->get(route('admin.permissions.index'))
+            ->assertForbidden();
+    }
+
     public function test_permissions_index_can_be_rendered(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->userWithPermissions('user.edit'));
 
         $this->get(route('admin.permissions.index'))->assertOk();
     }
@@ -100,9 +97,7 @@ class PermissionsTest extends TestCase
         $this->actingAs(User::factory()->create());
         $permission = Permission::create(['name' => 'view-reports', 'label' => 'View Reports', 'guard_name' => 'web']);
 
-        Livewire::test(Index::class)
-            ->call('edit', $permission->id)
-            ->assertSet('editingId', $permission->id)
+        Livewire::test(Edit::class, ['permission' => $permission])
             ->assertSet('name', 'view-reports')
             ->assertSet('label', 'View Reports')
             ->set('label', 'View All Reports')
@@ -120,8 +115,7 @@ class PermissionsTest extends TestCase
         $this->actingAs(User::factory()->create());
         $permission = Permission::create(['name' => 'delete-posts', 'label' => 'Delete Posts', 'guard_name' => 'web']);
 
-        Livewire::test(Index::class)
-            ->call('edit', $permission->id)
+        Livewire::test(Edit::class, ['permission' => $permission])
             ->set('name', 'delete-posts')
             ->set('label', 'Updated Label')
             ->call('save')
@@ -136,8 +130,7 @@ class PermissionsTest extends TestCase
         Permission::create(['name' => 'edit-posts', 'label' => 'Edit Posts', 'guard_name' => 'web']);
         $other = Permission::create(['name' => 'delete-posts', 'label' => 'Delete Posts', 'guard_name' => 'web']);
 
-        Livewire::test(Index::class)
-            ->call('edit', $other->id)
+        Livewire::test(Edit::class, ['permission' => $other])
             ->set('name', 'edit-posts')
             ->set('label', 'Delete Posts')
             ->call('save')
@@ -184,14 +177,13 @@ class PermissionsTest extends TestCase
     public function test_create_resets_form_state(): void
     {
         $this->actingAs(User::factory()->create());
-        $permission = Permission::create(['name' => 'edit-posts', 'label' => 'Edit Posts', 'guard_name' => 'web']);
 
         Livewire::test(Index::class)
-            ->call('edit', $permission->id)
-            ->assertSet('editingId', $permission->id)
+            ->set('name', 'leftover')
+            ->set('label', 'Leftover')
             ->call('create')
-            ->assertSet('editingId', null)
             ->assertSet('name', '')
-            ->assertSet('label', '');
+            ->assertSet('label', '')
+            ->assertDispatched('open-modal');
     }
 }

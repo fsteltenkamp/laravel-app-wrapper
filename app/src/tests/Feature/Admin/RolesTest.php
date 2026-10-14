@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Livewire\Admin\Roles\Edit;
 use App\Livewire\Admin\Roles\Index;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\View;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -20,16 +20,6 @@ class RolesTest extends TestCase
     {
         parent::setUp();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        View::share([
-            'mainTheme' => 'neutral',
-            'secondaryTheme' => 'slate',
-            'accentTheme' => 'sky',
-            'infoTheme' => 'blue',
-            'successTheme' => 'green',
-            'warningTheme' => 'yellow',
-            'errorTheme' => 'red',
-            'darkmode' => false,
-        ]);
     }
 
     public function test_roles_index_requires_authentication(): void
@@ -38,9 +28,16 @@ class RolesTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
+    public function test_roles_index_requires_permission(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->get(route('admin.roles.index'))
+            ->assertForbidden();
+    }
+
     public function test_roles_index_can_be_rendered(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->userWithPermissions('user.edit'));
 
         $this->get(route('admin.roles.index'))->assertOk();
     }
@@ -52,7 +49,8 @@ class RolesTest extends TestCase
         Livewire::test(Index::class)
             ->set('name', 'super-admin')
             ->call('save')
-            ->assertHasNoErrors();
+            ->assertHasNoErrors()
+            ->assertDispatched('fltc:toast', title: __('Permission group created.'), color: 'success');
 
         $this->assertDatabaseHas('roles', ['name' => 'super-admin', 'guard_name' => 'web']);
     }
@@ -67,19 +65,24 @@ class RolesTest extends TestCase
             ->assertHasErrors(['name' => 'required']);
     }
 
-    public function test_admin_can_create_role_with_permissions(): void
+    public function test_admin_can_create_role_and_assign_permissions(): void
     {
         $this->actingAs(User::factory()->create());
         Permission::create(['name' => 'edit-posts', 'label' => 'Edit Posts', 'guard_name' => 'web']);
 
         Livewire::test(Index::class)
             ->set('name', 'editor')
-            ->set('selectedPermissions', ['edit-posts'])
             ->call('save')
             ->assertHasNoErrors();
 
         $role = Role::findByName('editor', 'web');
-        $this->assertTrue($role->hasPermissionTo('edit-posts'));
+
+        Livewire::test(Edit::class, ['role' => $role])
+            ->set('selectedPermissions', ['edit-posts'])
+            ->call('savePermissions')
+            ->assertHasNoErrors();
+
+        $this->assertTrue($role->fresh()->hasPermissionTo('edit-posts'));
     }
 
     public function test_admin_can_edit_role_name(): void
@@ -87,12 +90,10 @@ class RolesTest extends TestCase
         $this->actingAs(User::factory()->create());
         $role = Role::create(['name' => 'writer', 'guard_name' => 'web']);
 
-        Livewire::test(Index::class)
-            ->call('edit', $role->id)
-            ->assertSet('editingId', $role->id)
+        Livewire::test(Edit::class, ['role' => $role])
             ->assertSet('name', 'writer')
             ->set('name', 'author')
-            ->call('save')
+            ->call('saveName')
             ->assertHasNoErrors();
 
         $this->assertDatabaseHas('roles', ['id' => $role->id, 'name' => 'author']);
@@ -105,10 +106,9 @@ class RolesTest extends TestCase
         $role = Role::create(['name' => 'editor', 'guard_name' => 'web']);
         Permission::create(['name' => 'delete-posts', 'label' => 'Delete Posts', 'guard_name' => 'web']);
 
-        Livewire::test(Index::class)
-            ->call('edit', $role->id)
+        Livewire::test(Edit::class, ['role' => $role])
             ->set('selectedPermissions', ['delete-posts'])
-            ->call('save')
+            ->call('savePermissions')
             ->assertHasNoErrors();
 
         $this->assertTrue($role->fresh()->hasPermissionTo('delete-posts'));
@@ -121,8 +121,7 @@ class RolesTest extends TestCase
         Permission::create(['name' => 'edit-posts', 'label' => 'Edit Posts', 'guard_name' => 'web']);
         $role->givePermissionTo('edit-posts');
 
-        Livewire::test(Index::class)
-            ->call('edit', $role->id)
+        Livewire::test(Edit::class, ['role' => $role])
             ->assertSet('selectedPermissions', ['edit-posts']);
     }
 
@@ -133,10 +132,9 @@ class RolesTest extends TestCase
         Permission::create(['name' => 'edit-posts', 'label' => 'Edit Posts', 'guard_name' => 'web']);
         $role->givePermissionTo('edit-posts');
 
-        Livewire::test(Index::class)
-            ->call('edit', $role->id)
+        Livewire::test(Edit::class, ['role' => $role])
             ->set('selectedPermissions', [])
-            ->call('save')
+            ->call('savePermissions')
             ->assertHasNoErrors();
 
         $this->assertFalse($role->fresh()->hasPermissionTo('edit-posts'));
@@ -170,14 +168,11 @@ class RolesTest extends TestCase
     public function test_create_resets_form_state(): void
     {
         $this->actingAs(User::factory()->create());
-        $role = Role::create(['name' => 'editor', 'guard_name' => 'web']);
 
         Livewire::test(Index::class)
-            ->call('edit', $role->id)
-            ->assertSet('editingId', $role->id)
+            ->set('name', 'leftover')
             ->call('create')
-            ->assertSet('editingId', null)
             ->assertSet('name', '')
-            ->assertSet('selectedPermissions', []);
+            ->assertDispatched('open-modal');
     }
 }

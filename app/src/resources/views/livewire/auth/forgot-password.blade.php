@@ -1,6 +1,6 @@
 <x-layouts::auth :title="__('Forgot password')">
     <div class="mx-auto w-full max-w-md">
-        <x-fltc::form.container.auth.simple :theme="$mainTheme">
+        <x-fltc::form.container.auth.simple>
             <div class="flex flex-col gap-6 p-8">
                 <x-auth-header :title="__('Forgot password')" :description="__('Enter your email to receive a password reset link')" />
 
@@ -16,19 +16,18 @@
                         :label="__('Email address')"
                         placeholder="email@example.com"
                         icon="envelope"
-                        :theme="$mainTheme"
                         required
                         autofocus
                     />
 
-                    <x-fltc::button :theme="$mainTheme" width="full" type="submit" data-test="email-password-reset-link-button">
+                    <x-fltc::button color="primary" width="full" type="submit" data-test="email-password-reset-link-button">
                         {{ __('Email password reset link') }}
                     </x-fltc::button>
                 </form>
 
-                <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-400">
+                <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-base-400">
                     <span>{{ __('Or, return to') }}</span>
-                    <a href="{{ route('login') }}" wire:navigate class="font-medium text-{{ $mainTheme }}-600 hover:underline dark:text-{{ $mainTheme }}-400">{{ __('log in') }}</a>
+                    <a href="{{ route('login') }}" wire:navigate class="font-medium text-primary-600 hover:underline dark:text-primary-400">{{ __('log in') }}</a>
                 </div>
             </div>
         </x-fltc::form.container.auth.simple>

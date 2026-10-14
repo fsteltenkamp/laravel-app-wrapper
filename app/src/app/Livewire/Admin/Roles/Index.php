@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Roles;
 
-use Flux\Flux;
+use App\Livewire\Concerns\ShowsToasts;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -13,6 +13,7 @@ use Spatie\Permission\Models\Role;
 #[Title('Permission groups')]
 class Index extends Component
 {
+    use ShowsToasts;
     use WithPagination;
 
     #[Url(as: 'q')]
@@ -37,7 +38,7 @@ class Index extends Component
         $role = Role::create(['name' => $this->name, 'guard_name' => 'web']);
         $role->syncPermissions([]);
 
-        Flux::toast(variant: 'success', text: __('Permission group created.'));
+        $this->toast(__('Permission group created.'));
 
         $this->dispatch('close-modal', name: 'role-form');
         $this->reset(['name']);
@@ -59,7 +60,7 @@ class Index extends Component
         $role = Role::find($this->confirmingDeleteId);
         $role?->delete();
 
-        Flux::toast(variant: 'success', text: __('Permission group deleted.'));
+        $this->toast(__('Permission group deleted.'));
 
         $this->confirmingDeleteId = null;
         $this->dispatch('close-modal', name: 'confirm-role-deletion');

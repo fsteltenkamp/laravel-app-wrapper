@@ -6,7 +6,6 @@ use App\Livewire\Admin\Teams\Index;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\View;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -17,16 +16,6 @@ class TeamsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        View::share([
-            'mainTheme' => 'neutral',
-            'secondaryTheme' => 'slate',
-            'accentTheme' => 'sky',
-            'infoTheme' => 'blue',
-            'successTheme' => 'green',
-            'warningTheme' => 'yellow',
-            'errorTheme' => 'red',
-            'darkmode' => false,
-        ]);
     }
 
     public function test_teams_index_requires_authentication(): void
@@ -35,9 +24,16 @@ class TeamsTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
+    public function test_teams_index_requires_permission(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->get(route('admin.teams.index'))
+            ->assertForbidden();
+    }
+
     public function test_teams_index_can_be_rendered(): void
     {
-        $this->actingAs(User::factory()->create());
+        $this->actingAs($this->userWithPermissions('user.edit'));
 
         $this->get(route('admin.teams.index'))->assertOk();
     }

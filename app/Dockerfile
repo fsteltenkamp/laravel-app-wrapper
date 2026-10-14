@@ -1,5 +1,5 @@
 # Base stage with common components
-FROM docker.io/dunglas/frankenphp:php8.5-bookworm AS base
+FROM docker.io/dunglas/frankenphp:php8.5-trixie AS base
 
 # Metadata
 LABEL org.opencontainers.image.licenses="ARR"
@@ -34,7 +34,7 @@ RUN install-php-extensions \
     redis
 
 # Install Composer
-COPY --from=docker.io/composer:latest /usr/bin/composer /usr/local/bin/composer
+COPY --from=docker.io/composer:2 /usr/bin/composer /usr/local/bin/composer
 
 # Production PHP config
 RUN cp $PHP_INI_DIR/php.ini-production $PHP_INI_DIR/php.ini

@@ -1,21 +1,21 @@
 <section class="w-full">
     @include('partials.admin-heading')
 
-    <div class="mb-4 flex justify-end">
-        <x-fltc::button :theme="$mainTheme" icon="plus" wire:click="create">{{ __('New team') }}</x-fltc::button>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <div class="w-full max-w-sm">
+            <x-fltc::form.input.text
+                model="search"
+                live
+                inline
+                :placeholder="__('Search by name…')"
+                icon="magnifying-glass"
+            />
+        </div>
+
+        <x-fltc::button color="primary" icon="plus" wire:click="create">{{ __('New team') }}</x-fltc::button>
     </div>
 
-    <div class="mb-4 w-full max-w-sm">
-        <x-fltc::form.input.text
-            model="search"
-            live
-            :theme="$mainTheme"
-            :placeholder="__('Search by name…')"
-            icon="magnifying-glass"
-        />
-    </div>
-
-    <x-fltc::table :theme="$mainTheme" hover>
+    <x-fltc::table hover>
         <x-fltc::table.head>
             <x-fltc::table.row>
                 <x-fltc::table.cell header>{{ __('Name') }}</x-fltc::table.cell>
@@ -30,18 +30,17 @@
                 <x-fltc::table.row wire:key="team-{{ $team->id }}">
                     <x-fltc::table.cell nowrap class="font-medium">{{ $team->name }}</x-fltc::table.cell>
                     <x-fltc::table.cell>
-                        <x-fltc::badge :theme="$mainTheme">{{ $team->users_count }}</x-fltc::badge>
+                        <x-fltc::badge>{{ $team->users_count }}</x-fltc::badge>
                     </x-fltc::table.cell>
                     <x-fltc::table.cell>
-                        <x-fltc::badge :theme="$mainTheme">{{ $team->roles_count }}</x-fltc::badge>
+                        <x-fltc::badge>{{ $team->roles_count }}</x-fltc::badge>
                     </x-fltc::table.cell>
                     <x-fltc::table.cell>
-                        <x-fltc::badge :theme="$mainTheme">{{ $team->permissions_count }}</x-fltc::badge>
+                        <x-fltc::badge>{{ $team->permissions_count }}</x-fltc::badge>
                     </x-fltc::table.cell>
                     <x-fltc::table.cell>
                         <div class="flex justify-end gap-2">
                             <x-fltc::button.link
-                                :theme="$mainTheme"
                                 variant="outline"
                                 height="sm"
                                 icon="pencil-simple"
@@ -49,7 +48,7 @@
                                 navigate
                             >{{ __('Edit') }}</x-fltc::button.link>
                             <x-fltc::button
-                                theme="red"
+                                color="danger"
                                 variant="outline"
                                 height="sm"
                                 icon="trash"
@@ -60,8 +59,8 @@
                 </x-fltc::table.row>
             @empty
                 <x-fltc::table.row>
-                    <x-fltc::table.cell colspan="5" class="text-center text-zinc-500">
-                        {{ __('No teams found.') }}
+                    <x-fltc::table.cell colspan="5">
+                        <x-fltc::empty size="sm" icon="buildings" :title="__('No teams found.')" />
                     </x-fltc::table.cell>
                 </x-fltc::table.row>
             @endforelse
@@ -69,7 +68,7 @@
     </x-fltc::table>
 
     <div class="mt-4">
-        {{ $teams->links() }}
+        {{ $teams->links('fltc::pagination.livewire') }}
     </div>
 
     {{-- Create team modal --}}
@@ -80,11 +79,11 @@
                 <x-fltc::subheading>{{ __('Create a team to group users and assign shared roles and permissions.') }}</x-fltc::subheading>
             </div>
 
-            <x-fltc::form.input.text model="newName" :label="__('Name')" :theme="$mainTheme" required />
+            <x-fltc::form.input.text model="newName" :label="__('Name')" required />
 
             <div class="flex justify-end gap-2">
-                <x-fltc::button variant="outline" theme="zinc" x-on:click="close()">{{ __('Cancel') }}</x-fltc::button>
-                <x-fltc::button :theme="$mainTheme" type="submit" icon="check">{{ __('Create team') }}</x-fltc::button>
+                <x-fltc::button variant="outline" x-on:click="close()">{{ __('Cancel') }}</x-fltc::button>
+                <x-fltc::button color="primary" type="submit" icon="check">{{ __('Create team') }}</x-fltc::button>
             </div>
         </form>
     </x-fltc::modal>
@@ -94,6 +93,6 @@
         :title="__('Delete team?')"
         :description="__('This removes the team and all of its member assignments. Users keep any individually assigned roles and permissions.')"
     >
-        <x-fltc::button theme="red" icon="trash" wire:click="deleteTeam">{{ __('Delete team') }}</x-fltc::button>
+        <x-fltc::button color="danger" icon="trash" wire:click="deleteTeam">{{ __('Delete team') }}</x-fltc::button>
     </x-fltc::modal.confirm>
 </section>

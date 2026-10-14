@@ -5,7 +5,7 @@
     </div>
 
     <x-fltc::button
-        theme="red"
+        color="danger"
         x-data
         x-on:click="$dispatch('open-modal', 'confirm-user-deletion')"
     >
@@ -22,12 +22,12 @@
                 </x-fltc::subheading>
             </div>
 
-            <x-fltc::form.input.password model="password" :label="__('Password')" :theme="$mainTheme" />
+            <x-fltc::form.input.password model="password" :label="__('Password')" />
 
             <div class="flex justify-end space-x-2 rtl:space-x-reverse">
-                <x-fltc::button variant="outline" theme="zinc" type="button" x-on:click="close()">{{ __('Cancel') }}</x-fltc::button>
+                <x-fltc::button variant="outline" type="button" x-on:click="close()">{{ __('Cancel') }}</x-fltc::button>
 
-                <x-fltc::button theme="red" type="submit">{{ __('Delete account') }}</x-fltc::button>
+                <x-fltc::button color="danger" type="submit">{{ __('Delete account') }}</x-fltc::button>
             </div>
         </form>
     </x-fltc::modal>

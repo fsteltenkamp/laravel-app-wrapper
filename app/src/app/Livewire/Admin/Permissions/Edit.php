@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin\Permissions;
 
+use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Permission;
-use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Title;
@@ -12,6 +12,8 @@ use Livewire\Component;
 #[Title('Edit permission')]
 class Edit extends Component
 {
+    use ShowsToasts;
+
     public Permission $permission;
 
     public string $name = '';
@@ -38,11 +40,11 @@ class Edit extends Component
         ]);
 
         $this->permission->update([
-            'name'  => $this->name,
+            'name' => $this->name,
             'label' => $this->label,
         ]);
 
-        Flux::toast(variant: 'success', text: __('Permission updated.'));
+        $this->toast(__('Permission updated.'));
     }
 
     public function render(): View

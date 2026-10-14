@@ -26,7 +26,7 @@ return new class extends Migration
         $admin = User::firstOrCreate(
             ['email' => 'admin@example.com'],
             [
-                'name'     => 'Admin',
+                'name' => 'Admin',
                 'password' => Hash::make('password'),
             ]
         );

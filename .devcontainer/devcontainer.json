@@ -7,7 +7,15 @@
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
-	"features": {},
+	"features": {
+		// The FrankenPHP base image has no non-root user; create the usual "vscode" one.
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"username": "vscode",
+			"userUid": "automatic",
+			"userGid": "automatic"
+		}
+	},
+	"remoteUser": "vscode",
 
 	// 8000 (Laravel), 3000 (Node), 3306 (MariaDB)
 	"forwardPorts": [8000, 3000, 3306],
@@ -48,7 +56,4 @@
 			]
 		}
 	}
-
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
 }

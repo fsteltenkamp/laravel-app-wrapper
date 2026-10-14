@@ -5,7 +5,6 @@ namespace Tests\Feature\Admin;
 use App\Livewire\Admin\Users\Index;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\View;
 use Livewire\Livewire;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -18,16 +17,6 @@ class UsersTest extends TestCase
     {
         parent::setUp();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        View::share([
-            'mainTheme' => 'neutral',
-            'secondaryTheme' => 'slate',
-            'accentTheme' => 'sky',
-            'infoTheme' => 'blue',
-            'successTheme' => 'green',
-            'warningTheme' => 'yellow',
-            'errorTheme' => 'red',
-            'darkmode' => false,
-        ]);
     }
 
     public function test_users_index_requires_authentication(): void

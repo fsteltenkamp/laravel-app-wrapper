@@ -1,5 +1,5 @@
 <div
-    class="py-6 space-y-6 border shadow-sm rounded-xl border-zinc-200 dark:border-white/10"
+    class="py-6 space-y-6 border shadow-sm rounded-xl border-base-200 dark:border-white/10"
     wire:cloak
     x-data="{ showRecoveryCodes: false }"
 >
@@ -19,7 +19,7 @@
                 x-show="!showRecoveryCodes"
                 icon="eye"
                 icon-variant="regular"
-                :theme="$mainTheme"
+                color="primary"
                 @click="showRecoveryCodes = true;"
                 aria-expanded="false"
                 aria-controls="recovery-codes-section"
@@ -31,7 +31,7 @@
                 x-show="showRecoveryCodes"
                 icon="eye-slash"
                 icon-variant="regular"
-                :theme="$mainTheme"
+                color="primary"
                 @click="showRecoveryCodes = false"
                 aria-expanded="true"
                 aria-controls="recovery-codes-section"
@@ -44,7 +44,6 @@
                     x-show="showRecoveryCodes"
                     icon="arrows-clockwise"
                     variant="outline"
-                    theme="zinc"
                     wire:click="regenerateRecoveryCodes"
                 >
                     {{ __('Regenerate codes') }}
@@ -61,14 +60,14 @@
         >
             <div class="mt-3 space-y-3">
                 @error('recoveryCodes')
-                    <x-fltc::alert theme="red">
+                    <x-fltc::alert color="danger">
                         <x-fltc::icon name="x-circle" after="2" />{{ $message }}
                     </x-fltc::alert>
                 @enderror
 
                 @if (filled($recoveryCodes))
                     <div
-                        class="grid gap-1 p-4 font-mono text-sm rounded-lg bg-zinc-100 dark:bg-white/5"
+                        class="grid gap-1 p-4 font-mono text-sm rounded-lg bg-base-100 dark:bg-white/5"
                         role="list"
                         aria-label="{{ __('Recovery codes') }}"
                     >
@@ -82,7 +81,7 @@
                             </div>
                         @endforeach
                     </div>
-                    <p class="text-xs text-zinc-500 dark:text-zinc-400">
+                    <p class="text-xs text-base-500 dark:text-base-400">
                         {{ __('Each recovery code can be used once to access your account and will be removed after use. If you need more, click Regenerate codes above.') }}
                     </p>
                 @endif

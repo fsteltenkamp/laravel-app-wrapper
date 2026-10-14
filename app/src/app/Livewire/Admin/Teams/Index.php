@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin\Teams;
 
+use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Team;
-use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -13,6 +13,7 @@ use Livewire\WithPagination;
 #[Title('Teams')]
 class Index extends Component
 {
+    use ShowsToasts;
     use WithPagination;
 
     #[Url(as: 'q')]
@@ -36,7 +37,7 @@ class Index extends Component
 
         Team::create(['name' => $this->newName]);
 
-        Flux::toast(variant: 'success', text: __('Team created.'));
+        $this->toast(__('Team created.'));
         $this->dispatch('close-modal', name: 'team-form');
     }
 
@@ -56,7 +57,7 @@ class Index extends Component
         $team = Team::find($this->confirmingDeleteId);
         $team?->delete();
 
-        Flux::toast(variant: 'success', text: __('Team deleted.'));
+        $this->toast(__('Team deleted.'));
 
         $this->confirmingDeleteId = null;
         $this->dispatch('close-modal', name: 'confirm-team-deletion');

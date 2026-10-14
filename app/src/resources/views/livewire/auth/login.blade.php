@@ -1,12 +1,12 @@
 <x-layouts::auth :title="__('Log in')">
-    <x-fltc::form.container.auth.two-col-right :theme="$mainTheme">
+    <x-fltc::form.container.auth.two-col-right>
         <x-slot:side>
             <div class="flex h-full flex-col">
-                <a href="#" class="flex items-center gap-2 font-semibold tracking-tight">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-{{ $mainTheme }}-500 text-white">
-                        <i class="ph ph-cube text-lg" aria-hidden="true"></i>
+                <a href="{{ route('home') }}" class="flex items-center gap-2 font-semibold tracking-tight">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-600 text-white">
+                        <x-fltc::icon name="cube" size="lg" />
                     </span>
-                    {{config('app.name')}}
+                    {{ config('app.name') }}
                 </a>
 
                 <div class="mt-auto">
@@ -26,50 +26,49 @@
         </x-slot:side>
 
         <div>
-            <x-fltc::heading class="text-2xl font-bold tracking-tight">Welcome back</x-fltc::heading>
-            <x-fltc::subheading class="mt-1 text-sm">Sign in to continue to your dashboard.</x-fltc::subheading>
+            <x-fltc::heading class="text-2xl font-bold tracking-tight">{{ __('Welcome back') }}</x-fltc::heading>
+            <x-fltc::subheading class="mt-1 text-sm">{{ __('Sign in to continue to your dashboard.') }}</x-fltc::subheading>
 
             <x-auth-session-status class="text-center" :status="session('status')" />
 
             <form method="POST" action="{{ route('login.store') }}" class="mt-6">
+                @csrf
 
                 <x-passkey-verify />
 
                 <x-fltc::form.input.email
                     id="email"
-                    label="Email address"
+                    :label="__('Email address')"
                     placeholder="you@example.com"
                     icon="envelope"
                     autocomplete="email"
-                    :theme="$mainTheme"
                     required
                     autofocus
                 />
 
                 <x-fltc::form.input.password
                     id="password"
-                    label="Password"
+                    :label="__('Password')"
                     placeholder="••••••••"
                     icon="lock"
                     autocomplete="current-password"
-                    :theme="$mainTheme"
                     required
                 />
 
                 <div class="mb-4 flex items-center justify-between">
-                    <x-fltc::form.checkbox id="remember" label="Remember me" :theme="$mainTheme" :bordered="false" class="px-0!" />
+                    <x-fltc::form.checkbox id="remember" :label="__('Remember me')" :bordered="false" class="px-0!" />
                     @if (Route::has('password.request'))
-                        <a href="{{route('password.request')}}" class="text-sm font-medium text-{{ $mainTheme }}-600 hover:underline dark:text-{{ $mainTheme }}-400">Forgot password?</a>
+                        <a href="{{ route('password.request') }}" class="text-sm font-medium text-primary-600 hover:underline dark:text-primary-400">{{ __('Forgot password?') }}</a>
                     @endif
                 </div>
 
-                <x-fltc::button :theme="$mainTheme" width="full" type="submit">Sign in</x-fltc::button>
+                <x-fltc::button color="primary" width="full" type="submit">{{ __('Sign in') }}</x-fltc::button>
             </form>
 
             @if (Route::has('auth.register'))
                 <p class="mt-6 text-sm opacity-70">
-                    Don't have an account?
-                    <a href="{{route('auth.register')}}" class="font-medium text-{{ $mainTheme }}-600 hover:underline dark:text-{{ $mainTheme }}-400">Create one</a>
+                    {{ __('Don\'t have an account?') }}
+                    <a href="{{ route('auth.register') }}" class="font-medium text-primary-600 hover:underline dark:text-primary-400">{{ __('Create one') }}</a>
                 </p>
             @endif
         </div>

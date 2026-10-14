@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Spatie\Permission\Models\Permission as SpatiePermission;
 
+/**
+ * @property string|null $label
+ */
 class Permission extends SpatiePermission
 {
     /** @var list<string> */

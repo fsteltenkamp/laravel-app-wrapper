@@ -26,6 +26,7 @@ abstract class TestCase extends BaseTestCase
             $user->givePermissionTo($permissions);
         }
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+
         return $user;
     }
 }

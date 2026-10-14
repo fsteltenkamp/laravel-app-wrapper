@@ -31,8 +31,7 @@ class AppServiceProvider extends ServiceProvider
 
     protected function defineGates(): void
     {
-        Gate::define('manage-users', fn (User $user) =>
-            $user->hasAnyPermission(['user.create', 'user.edit', 'user.delete'])
+        Gate::define('manage-users', fn (User $user) => $user->hasAnyPermission(['user.create', 'user.edit', 'user.delete'])
         );
     }
 

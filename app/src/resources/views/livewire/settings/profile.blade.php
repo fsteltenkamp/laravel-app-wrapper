@@ -5,19 +5,19 @@
 
     <x-settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
-            <x-fltc::form.input.text model="name" :label="__('Name')" :theme="$mainTheme" required autofocus autocomplete="name" />
+            <x-fltc::form.input.text model="name" :label="__('Name')" required autofocus autocomplete="name" />
 
             <div>
-                <x-fltc::form.input.email model="email" :label="__('Email')" :theme="$mainTheme" required autocomplete="email" />
+                <x-fltc::form.input.email model="email" :label="__('Email')" required autocomplete="email" />
 
                 @if ($this->hasUnverifiedEmail)
-                    <p class="mt-4 text-sm text-zinc-600 dark:text-zinc-300">
+                    <p class="mt-4 text-sm text-base-600 dark:text-base-300">
                         {{ __('Your email address is unverified.') }}
 
                         <button
                             type="button"
                             wire:click.prevent="resendVerificationNotification"
-                            class="cursor-pointer font-medium text-{{ $mainTheme }}-600 hover:underline dark:text-{{ $mainTheme }}-400"
+                            class="cursor-pointer font-medium text-primary-600 hover:underline dark:text-primary-400"
                         >
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
@@ -26,7 +26,7 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <x-fltc::button :theme="$mainTheme" type="submit">{{ __('Save') }}</x-fltc::button>
+                <x-fltc::button color="primary" type="submit">{{ __('Save') }}</x-fltc::button>
             </div>
         </form>
 

@@ -29,15 +29,11 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property string|null $main_theme
- * @property string|null $secondary_theme
- * @property string|null $accent_theme
- * @property string|null $info_theme
- * @property string|null $success_theme
- * @property string|null $warning_theme
- * @property string|null $error_theme
+ * @property string|null $skin
+ * @property string|null $theme
+ * @property array<string, string>|null $theme_colors
  */
-#[Fillable(['name', 'email', 'password', 'main_theme', 'secondary_theme', 'accent_theme', 'info_theme', 'success_theme', 'warning_theme', 'error_theme'])]
+#[Fillable(['name', 'email', 'password', 'skin', 'theme', 'theme_colors'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements PasskeyUser
 {
@@ -54,9 +50,13 @@ class User extends Authenticatable implements PasskeyUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'theme_colors' => 'array',
         ];
     }
 
+    /**
+     * @return BelongsToMany<Team, $this>
+     */
     public function teams(): BelongsToMany
     {
         return $this->belongsToMany(Team::class);

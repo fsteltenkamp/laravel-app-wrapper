@@ -1,6 +1,6 @@
 <x-layouts::auth :title="__('Confirm password')">
     <div class="mx-auto w-full max-w-md">
-        <x-fltc::form.container.auth.simple :theme="$mainTheme">
+        <x-fltc::form.container.auth.simple>
             <div class="flex flex-col gap-6 p-8">
                 <x-auth-header
                     :title="__('Confirm password')"
@@ -25,12 +25,11 @@
                         :label="__('Password')"
                         :placeholder="__('Password')"
                         icon="lock"
-                        :theme="$mainTheme"
                         required
                         autocomplete="current-password"
                     />
 
-                    <x-fltc::button :theme="$mainTheme" width="full" type="submit" data-test="confirm-password-button">
+                    <x-fltc::button color="primary" width="full" type="submit" data-test="confirm-password-button">
                         {{ __('Confirm') }}
                     </x-fltc::button>
                 </form>

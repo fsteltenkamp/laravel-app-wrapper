@@ -7,7 +7,6 @@ use App\Models\Permission;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\View;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -21,16 +20,6 @@ class UserEditTest extends TestCase
     {
         parent::setUp();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        View::share([
-            'mainTheme' => 'neutral',
-            'secondaryTheme' => 'slate',
-            'accentTheme' => 'sky',
-            'infoTheme' => 'blue',
-            'successTheme' => 'green',
-            'warningTheme' => 'yellow',
-            'errorTheme' => 'red',
-            'darkmode' => false,
-        ]);
     }
 
     public function test_user_edit_page_requires_authentication(): void

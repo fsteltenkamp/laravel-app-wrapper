@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin\Roles;
 
+use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Permission;
-use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -12,6 +12,8 @@ use Spatie\Permission\Models\Role;
 #[Title('Edit permission group')]
 class Edit extends Component
 {
+    use ShowsToasts;
+
     public Role $role;
 
     public string $name = '';
@@ -34,14 +36,14 @@ class Edit extends Component
 
         $this->role->update(['name' => $this->name]);
 
-        Flux::toast(variant: 'success', text: __('Permission group name updated.'));
+        $this->toast(__('Permission group name updated.'));
     }
 
     public function savePermissions(): void
     {
         $this->role->syncPermissions($this->selectedPermissions);
 
-        Flux::toast(variant: 'success', text: __('Permissions updated.'));
+        $this->toast(__('Permissions updated.'));
     }
 
     public function render(): View

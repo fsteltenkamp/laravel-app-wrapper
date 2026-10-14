@@ -6,7 +6,6 @@ use App\Livewire\Admin\Teams\Edit;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\View;
 use Livewire\Livewire;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -19,16 +18,6 @@ class TeamEditTest extends TestCase
     {
         parent::setUp();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        View::share([
-            'mainTheme' => 'neutral',
-            'secondaryTheme' => 'slate',
-            'accentTheme' => 'sky',
-            'infoTheme' => 'blue',
-            'successTheme' => 'green',
-            'warningTheme' => 'yellow',
-            'errorTheme' => 'red',
-            'darkmode' => false,
-        ]);
     }
 
     public function test_team_edit_page_requires_authentication(): void
@@ -39,9 +28,17 @@ class TeamEditTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
-    public function test_team_edit_page_can_be_rendered(): void
+    public function test_team_edit_page_requires_permission(): void
     {
         $this->actingAs(User::factory()->create());
+        $team = Team::create(['name' => 'Engineering']);
+
+        $this->get(route('admin.teams.edit', $team))->assertForbidden();
+    }
+
+    public function test_team_edit_page_can_be_rendered(): void
+    {
+        $this->actingAs($this->userWithPermissions('user.edit'));
         $team = Team::create(['name' => 'Engineering']);
 
         $this->get(route('admin.teams.edit', $team))->assertOk();

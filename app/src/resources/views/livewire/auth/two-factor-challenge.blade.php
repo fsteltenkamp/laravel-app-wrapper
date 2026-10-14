@@ -1,6 +1,6 @@
 <x-layouts::auth :title="__('Two-factor authentication')">
     <div class="mx-auto w-full max-w-md">
-        <x-fltc::form.container.auth.simple :theme="$mainTheme">
+        <x-fltc::form.container.auth.simple>
             <div
                 class="relative h-auto w-full p-8"
                 x-cloak
@@ -54,7 +54,6 @@
                                     x-model="code"
                                     length="6"
                                     name="code"
-                                    :theme="$mainTheme"
                                 />
                             </div>
                         </div>
@@ -67,13 +66,12 @@
                                     x-bind:required="showRecoveryInput"
                                     autocomplete="one-time-code"
                                     x-model="recovery_code"
-                                    :theme="$mainTheme"
                                 />
                             </div>
                         </div>
 
                         <x-fltc::button
-                            :theme="$mainTheme"
+                            color="primary"
                             type="submit"
                             width="full"
                         >

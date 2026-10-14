@@ -1,38 +1,29 @@
 @php
     $settingsNav = [
-        ['route' => 'profile.edit', 'label' => __('Profile')],
-        ['route' => 'security.edit', 'label' => __('Security')],
-        ['route' => 'appearance.edit', 'label' => __('Appearance')],
+        ['route' => 'profile.edit', 'label' => __('Profile'), 'icon' => 'user'],
+        ['route' => 'security.edit', 'label' => __('Security'), 'icon' => 'shield-check'],
+        ['route' => 'appearance.edit', 'label' => __('Appearance'), 'icon' => 'palette'],
     ];
 @endphp
 
-<div class="flex items-start max-md:flex-col">
-    <div class="me-10 w-full pb-4 md:w-[220px]">
-        <nav aria-label="{{ __('Settings') }}" class="flex flex-col gap-1">
+<div class="w-full">
+    <x-fltc::tabs color="primary" aria-label="{{ __('Settings') }}" class="mb-6">
+        <x-slot:list>
             @foreach ($settingsNav as $item)
-                @php $active = request()->routeIs($item['route']); @endphp
-                <a
-                    href="{{ route($item['route']) }}"
+                <x-fltc::tabs.tab
+                    :href="route($item['route'])"
+                    :current="request()->routeIs($item['route'])"
+                    :icon="$item['icon']"
                     wire:navigate
-                    @class([
-                        'rounded-lg px-3 py-2 text-sm font-medium transition',
-                        'bg-'.$mainTheme.'-100 text-'.$mainTheme.'-900 dark:bg-'.$mainTheme.'-900/40 dark:text-'.$mainTheme.'-100' => $active,
-                        'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100' => ! $active,
-                    ])
-                    @if ($active) aria-current="page" @endif
-                >{{ $item['label'] }}</a>
+                >{{ $item['label'] }}</x-fltc::tabs.tab>
             @endforeach
-        </nav>
-    </div>
+        </x-slot:list>
+    </x-fltc::tabs>
 
-    <x-fltc::separator class="md:hidden" />
+    <x-fltc::heading level="2">{{ $heading ?? '' }}</x-fltc::heading>
+    <x-fltc::subheading>{{ $subheading ?? '' }}</x-fltc::subheading>
 
-    <div class="flex-1 self-stretch max-md:pt-6">
-        <x-fltc::heading level="2">{{ $heading ?? '' }}</x-fltc::heading>
-        <x-fltc::subheading>{{ $subheading ?? '' }}</x-fltc::subheading>
-
-        <div class="mt-5 w-full max-w-lg">
-            {{ $slot }}
-        </div>
+    <div class="mt-5 w-full">
+        {{ $slot }}
     </div>
 </div>

@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Admin\Permissions;
 
+use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Permission;
-use Flux\Flux;
 use Illuminate\Contracts\View\View;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Title;
@@ -14,6 +14,7 @@ use Livewire\WithPagination;
 #[Title('Permissions')]
 class Index extends Component
 {
+    use ShowsToasts;
     use WithPagination;
 
     #[Url(as: 'q')]
@@ -34,17 +35,17 @@ class Index extends Component
     public function save(): void
     {
         $this->validate([
-            'name'  => ['required', 'string', 'max:255', Rule::unique(Permission::class, 'name')->where('guard_name', 'web')],
+            'name' => ['required', 'string', 'max:255', Rule::unique(Permission::class, 'name')->where('guard_name', 'web')],
             'label' => ['required', 'string', 'max:255'],
         ]);
 
         Permission::create([
-            'name'       => $this->name,
-            'label'      => $this->label,
+            'name' => $this->name,
+            'label' => $this->label,
             'guard_name' => 'web',
         ]);
 
-        Flux::toast(variant: 'success', text: __('Permission created.'));
+        $this->toast(__('Permission created.'));
 
         $this->dispatch('close-modal', name: 'permission-form');
         $this->reset(['name', 'label']);
@@ -65,7 +66,7 @@ class Index extends Component
     {
         Permission::find($this->confirmingDeleteId)?->delete();
 
-        Flux::toast(variant: 'success', text: __('Permission deleted.'));
+        $this->toast(__('Permission deleted.'));
 
         $this->confirmingDeleteId = null;
         $this->dispatch('close-modal', name: 'confirm-permission-deletion');
