@@ -16,6 +16,8 @@ x-environment: &common-env
   # session
   SESSION_DOMAIN: ${SESSION_DOMAIN:-null}
   SESSION_LIFETIME: ${SESSION_LIFETIME:-120}
+  # reverse proxy (comma-separated IPs/CIDRs, PRIVATE_SUBNETS, * or empty for none)
+  TRUSTED_PROXIES: ${TRUSTED_PROXIES-PRIVATE_SUBNETS}
   # mysql
   DB_USERNAME: ${MYSQL_USERNAME:-app}
   DB_PASSWORD: ${MYSQL_PASSWORD:-secret}

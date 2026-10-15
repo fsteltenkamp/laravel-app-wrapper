@@ -3,6 +3,20 @@
 Each section lists what changed in the template and what an app built from it has to do.
 Newest first.
 
+## 2026-10 — Trusted proxies
+
+`X-Forwarded-*` headers from the reverse proxy are now trusted, controlled by
+`TRUSTED_PROXIES` (default `PRIVATE_SUBNETS` in the container, see the README).
+
+- Copy `app/src/config/trustedproxy.php`.
+- `app/deployment-scripts/shared/00-env-populate.sh`: add
+  `TRUSTED_PROXIES=${TRUSTED_PROXIES-PRIVATE_SUBNETS}` to the "Extern gesetzt" block.
+- `docker-compose.yml`: add `TRUSTED_PROXIES: ${TRUSTED_PROXIES-PRIVATE_SUBNETS}` to
+  `x-environment`. Add `TRUSTED_PROXIES` to your deployment's env if the default doesn't fit.
+- If the app already called `$middleware->trustProxies(at: …)` in `bootstrap/app.php`,
+  remove it — that call overrides the config value.
+- Optional: copy `app/src/tests/Feature/TrustedProxiesTest.php`.
+
 ## 2026-10 — PHP 8.5, fltc colour roles, Flux removed
 
 ### Runtime and dependencies

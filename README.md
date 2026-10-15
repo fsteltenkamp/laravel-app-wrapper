@@ -18,6 +18,22 @@ The setup process is pretty simple:
 5. Use `test.sh` to check if the project runs correctly
 6. Deploy on your production hardware 👌 (I use Dokploy, but it should work with many more similar projects or just use `docker compose up -d`)
 
+## Reverse proxy
+
+The app container serves plain HTTP on port 80 and expects a reverse proxy (Traefik,
+nginx, …) in front of it to terminate TLS. `TRUSTED_PROXIES` says whose `X-Forwarded-*`
+headers Laravel believes, so client IPs, `https` URLs and secure cookies come out right:
+
+| Value | Trusts |
+| --- | --- |
+| `PRIVATE_SUBNETS` (default in the container) | any proxy on a private/loopback network, e.g. the Docker network |
+| `10.0.1.5,172.18.0.0/16` | only these IPs/CIDRs |
+| `*` | every peer — only if nothing but the proxy can reach the container |
+| empty | nobody (forwarded headers are ignored) |
+
+It is read by `app/src/config/trustedproxy.php`. If the container's port is published to
+the internet directly, set an explicit proxy IP instead of `PRIVATE_SUBNETS`.
+
 ## Look and feel
 
 The starter app uses [fltc](https://github.com/fsteltenkamp/laravel-twcss-components) components.
