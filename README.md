@@ -56,6 +56,12 @@ breadcrumbs as a top-level slot, outside its root element:
 On wide screens users can hide the sidebar and open it from the top bar when they need it, or
 pin it back. The choice is kept per browser.
 
+## Teams and permissions
+
+Permissions and roles given to a team count for all of its members, in `can()`, `@can`, `can:`
+route middleware and `hasAnyPermission()`. `hasRole()` and `@role` only look at the user's own
+roles, so use `can()` for anything a team should be able to grant.
+
 ## Notifications
 
 On *Settings → Notifications* users add their own channels (Gotify, Discord webhook, email to
@@ -88,7 +94,9 @@ Each channel can have its own message text, with the placeholders `{title}`, `{m
 `{event}` and `{time}`. Empty means the default for that channel type.
 
 To add a service, implement `ChannelDriver` and add it under `channels` in the same config file.
-The form on the settings page is built from the driver's `fields()`.
+The form on the settings page is built from the driver's `fields()`, and `defaultTemplate()` is
+the message text of channels that don't set their own. Call `$channel->renderBody($message)` in
+`send()` to get the final text.
 
 Generic webhooks receive a JSON `POST` with `event`, `title`, `message`, `url` and `occurred_at`,
 where a channel's message text sets `message`.
@@ -98,6 +106,8 @@ Users enter the URLs the server calls, so channels may only point to public addr
 `NOTIFICATIONS_ALLOW_PRIVATE_HOSTS=true` to allow private ones, e.g. a Gotify server on the same
 network. Only do that if every user of the app is trusted, since they could then reach internal
 services such as the database or Redis.
+
+Channel settings are encrypted with `APP_KEY`, so rotating the key means re-entering them.
 
 ## Updating apps built from this template
 

@@ -8,11 +8,20 @@ Newest first.
 Permissions and roles given to a team now count for its members in `can()`, `@can` and
 `hasAnyPermission()`. Saving roles or permissions on a team no longer throws `GuardDoesNotMatch`.
 
-- `app/Models/User.php`: copy the `HasRoles` alias and `hasPermissionTo()`.
-- `app/Models/Team.php`: add `$guard_name`.
-- Check who is in your teams, and what those teams were given: anything assigned to a team
-  before this update starts to apply to its members now.
-- Optional: copy `app/src/tests/Feature/TeamPermissionsTest.php`.
+- `app/Models/User.php`: copy the `hasOwnPermissionTo` alias on the trait `use` statement,
+  `hasPermissionTo()` and the `Spatie\Permission\Contracts\Permission` import.
+- `app/Models/Team.php`: add `protected string $guard_name = 'web';` (your guard, if it isn't
+  `web`).
+- If the app overrides `hasPermissionTo()` or has its own team permission logic, merge it with
+  the above or remove it.
+- Before deploying, check what your teams have been given: anything already assigned to a team
+  (by a seeder, for example) starts to apply to its members with this update.
+- `hasRole()`, `@role` and `getAllPermissions()` are unchanged and still only look at the
+  user's own roles and permissions. Use `can()` for anything a team should be able to grant.
+- A user's teams are loaded once per model instance. After changing membership in the same
+  request, check permissions on `$user->fresh()`.
+- Optional: copy `app/src/tests/Feature/TeamPermissionsTest.php` and the two team assignment
+  tests at the end of `app/src/tests/Feature/Admin/TeamEditTest.php`.
 
 ## 2026-11 — Notifications
 
@@ -26,17 +35,33 @@ subscribe them to events on *Settings → Notifications*. See the README, "Notif
   `app/src/config/notifications.php` and
   `app/src/database/migrations/2026_11_09_00000*`, then migrate.
 - `app/Models/User.php`: add the `notificationChannels()` relation.
-- `routes/settings.php`: add the `notifications.edit` route. Add the tab to
-  `resources/views/components/settings/layout.blade.php`.
+- `routes/settings.php`: add, in the `['auth', 'verified']` group,
+  `Route::livewire('settings/notifications', Notifications::class)->name('notifications.edit');`
+  and import `App\Livewire\Settings\Notifications`.
+- `resources/views/components/settings/layout.blade.php`: add
+  `['route' => 'notifications.edit', 'label' => __('Notifications'), 'icon' => 'bell'],` to
+  `$settingsNav`.
 - Register your app's events in `config/notifications.php`, and send them with
-  `app(Notifier::class)->send(…)`. Keep or remove the example events for users and teams. Those
-  are sent from the `Admin/Users` and `Admin/Teams` Livewire components, and
-  `team.members_changed` needs `app/src/app/Policies/TeamPolicy.php`.
+  `app(Notifier::class)->send(…)`. See the README, "Notifications".
+- Example events for users and teams, keep them or leave them out together:
+  - The `send()` calls are in `Admin/Users/Index` (`save`, `deleteUser`), `Admin/Users/Edit`
+    (`saveTeams`), `Admin/Teams/Index` (`save`, `deleteTeam`) and `Admin/Teams/Edit`
+    (`saveMembers`). Copy them if you merge those components by hand.
+  - `send()` throws for an event that isn't registered, so remove the call together with the
+    event.
+  - `team.members_changed` needs `app/src/app/Policies/TeamPolicy.php`. If the app has its own
+    `TeamPolicy`, give it a `view()` method instead.
 - `app/deployment-scripts/shared/00-env-populate.sh`: add
   `NOTIFICATIONS_ALLOW_PRIVATE_HOSTS=${NOTIFICATIONS_ALLOW_PRIVATE_HOSTS:-false}` to the
   "Extern gesetzt" block.
-- `docker-compose.yml`: add `NOTIFICATIONS_ALLOW_PRIVATE_HOSTS` to `x-environment`.
+- `docker-compose.yml`: add
+  `NOTIFICATIONS_ALLOW_PRIVATE_HOSTS: ${NOTIFICATIONS_ALLOW_PRIVATE_HOSTS:-false}` to
+  `x-environment`. Set it to `true` in your deployment's env only if channels have to reach
+  private addresses and every user is trusted.
+- `app/src/.env.example`: add the commented `NOTIFICATIONS_ALLOW_PRIVATE_HOSTS` entry.
 - The queue worker has to run, deliveries are queued.
+- Channel settings are encrypted with `APP_KEY`. Rotating the key makes them unreadable, and
+  users then have to enter their channels again.
 - Optional: copy `app/src/tests/Feature/Notifications/` and
   `app/src/tests/Feature/Settings/NotificationsTest.php`.
 
