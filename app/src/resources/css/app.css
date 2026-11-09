@@ -33,3 +33,33 @@
         border-color: var(--color-base-200, currentColor);
     }
 }
+
+/*
+ * Sidebar pinned or hidden (from lg up; resources/views/partials/sidebar-state.blade.php).
+ * Below lg, fltc's drawer applies unchanged. Hidden, the sidebar leaves the layout and the
+ * top bar's toggle slides it in over the content, as on small screens. Unlayered, so these
+ * beat the sidebar's own lg: utilities.
+ */
+@media (width >= 64rem) {
+    html:not([data-sidebar="collapsed"]) [data-sidebar-when="pinned"],
+    html[data-sidebar="collapsed"] [data-sidebar-when="collapsed"] {
+        display: inline-flex;
+    }
+
+    html[data-sidebar="collapsed"] .app-sidebar {
+        position: fixed;
+        inset-block: 0;
+        left: 0;
+        z-index: 50;
+        translate: -100% 0;
+    }
+
+    html[data-sidebar="collapsed"] .app-sidebar[data-open] {
+        translate: 0 0;
+        box-shadow: var(--shadow-2xl);
+    }
+
+    html[data-sidebar="collapsed"] .app-sidebar-toggle {
+        display: inline-flex;
+    }
+}

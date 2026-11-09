@@ -10,6 +10,7 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
 @include('partials.appearance')
+@include('partials.sidebar-state')
 
 @fonts
 

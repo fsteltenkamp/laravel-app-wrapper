@@ -3,6 +3,7 @@
         ['route' => 'profile.edit', 'label' => __('Profile'), 'icon' => 'user'],
         ['route' => 'security.edit', 'label' => __('Security'), 'icon' => 'shield-check'],
         ['route' => 'appearance.edit', 'label' => __('Appearance'), 'icon' => 'palette'],
+        ['route' => 'notifications.edit', 'label' => __('Notifications'), 'icon' => 'bell'],
     ];
 @endphp
 

@@ -6,6 +6,7 @@ use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Permission;
 use App\Models\Team;
 use App\Models\User;
+use App\Notifications\Notifier;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rule;
@@ -117,7 +118,11 @@ class Edit extends Component
     {
         $this->authorize('user.edit');
 
-        $this->user->teams()->sync($this->selectedTeams);
+        $changes = $this->user->teams()->sync($this->selectedTeams);
+
+        foreach (Team::whereIn('id', [...$changes['attached'], ...$changes['detached']])->get() as $team) {
+            app(Notifier::class)->send('team.members_changed', __('The members of :team changed.', ['team' => $team->name]), route('admin.teams.edit', $team), $team);
+        }
 
         // The current team context may no longer be a team the user belongs to.
         if ($this->teamContext !== null && ! in_array($this->teamContext, $this->selectedTeams, true)) {

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Users;
 
 use App\Livewire\Concerns\ShowsToasts;
 use App\Models\User;
+use App\Notifications\Notifier;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -47,11 +48,13 @@ class Index extends Component
             'newPassword' => ['required', 'string', 'min:8'],
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $this->newName,
             'email' => $this->newEmail,
             'password' => Hash::make($this->newPassword),
         ]);
+
+        app(Notifier::class)->send('user.created', __(':name was added.', ['name' => $user->name]), route('admin.users.edit', $user));
 
         $this->toast(__('User created.'));
 
@@ -78,6 +81,8 @@ class Index extends Component
 
         if ($user && $user->isNot(Auth::user())) {
             $user->delete();
+
+            app(Notifier::class)->send('user.deleted', __(':name was removed.', ['name' => $user->name]));
 
             $this->toast(__('User deleted.'));
         }

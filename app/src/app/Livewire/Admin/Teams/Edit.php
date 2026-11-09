@@ -6,6 +6,7 @@ use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Permission;
 use App\Models\Team;
 use App\Models\User;
+use App\Notifications\Notifier;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Title;
@@ -52,7 +53,11 @@ class Edit extends Component
 
     public function saveMembers(): void
     {
-        $this->team->users()->sync($this->selectedUsers);
+        $changes = $this->team->users()->sync($this->selectedUsers);
+
+        if ($changes['attached'] !== [] || $changes['detached'] !== []) {
+            app(Notifier::class)->send('team.members_changed', __('The members of :team changed.', ['team' => $this->team->name]), route('admin.teams.edit', $this->team), $this->team);
+        }
 
         $this->toast(__('Team members updated.'));
     }

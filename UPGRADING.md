@@ -3,6 +3,62 @@
 Each section lists what changed in the template and what an app built from it has to do.
 Newest first.
 
+## 2026-11 — Team permissions apply to members
+
+Permissions and roles given to a team now count for its members in `can()`, `@can` and
+`hasAnyPermission()`. Saving roles or permissions on a team no longer throws `GuardDoesNotMatch`.
+
+- `app/Models/User.php`: copy the `HasRoles` alias and `hasPermissionTo()`.
+- `app/Models/Team.php`: add `$guard_name`.
+- Check who is in your teams, and what those teams were given: anything assigned to a team
+  before this update starts to apply to its members now.
+- Optional: copy `app/src/tests/Feature/TeamPermissionsTest.php`.
+
+## 2026-11 — Notifications
+
+Users can add notification channels (Gotify, Discord webhook, email, generic webhook) and
+subscribe them to events on *Settings → Notifications*. See the README, "Notifications".
+
+- Copy `app/src/app/Notifications/`, `app/src/app/Jobs/DeliverNotification.php`,
+  `app/src/app/Models/NotificationChannel.php`, `app/src/app/Models/NotificationSubscription.php`,
+  `app/src/app/Livewire/Settings/Notifications.php`,
+  `app/src/resources/views/livewire/settings/notifications.blade.php`,
+  `app/src/config/notifications.php` and
+  `app/src/database/migrations/2026_11_09_00000*`, then migrate.
+- `app/Models/User.php`: add the `notificationChannels()` relation.
+- `routes/settings.php`: add the `notifications.edit` route. Add the tab to
+  `resources/views/components/settings/layout.blade.php`.
+- Register your app's events in `config/notifications.php`, and send them with
+  `app(Notifier::class)->send(…)`. Keep or remove the example events for users and teams. Those
+  are sent from the `Admin/Users` and `Admin/Teams` Livewire components, and
+  `team.members_changed` needs `app/src/app/Policies/TeamPolicy.php`.
+- `app/deployment-scripts/shared/00-env-populate.sh`: add
+  `NOTIFICATIONS_ALLOW_PRIVATE_HOSTS=${NOTIFICATIONS_ALLOW_PRIVATE_HOSTS:-false}` to the
+  "Extern gesetzt" block.
+- `docker-compose.yml`: add `NOTIFICATIONS_ALLOW_PRIVATE_HOSTS` to `x-environment`.
+- The queue worker has to run, deliveries are queued.
+- Optional: copy `app/src/tests/Feature/Notifications/` and
+  `app/src/tests/Feature/Settings/NotificationsTest.php`.
+
+## 2026-11 — Slim top bar, breadcrumbs, hideable sidebar
+
+The top bar is now 48px (was 64px) and shows breadcrumbs. From `lg` up, users can hide the
+sidebar (it then opens over the content from the top bar) and pin it back; the choice is kept
+in `localStorage` under `app-sidebar`.
+
+- Copy `app/src/resources/views/layouts/app.blade.php` and re-add your sidebar links. If you
+  changed the brand row, keep the two buttons with `data-sidebar-when`. The sidebar needs the
+  `app-sidebar` class with its `x-bind:data-open` / `x-on:click.outside` attributes, and the
+  navbar toggle needs `app-sidebar-toggle`.
+- Copy `app/src/resources/views/partials/sidebar-state.blade.php` and include it in
+  `partials/head.blade.php` after `partials.appearance`.
+- `resources/css/app.css`: copy the "Sidebar pinned or hidden" block at the end.
+- Breadcrumbs: add an `<x-slot:breadcrumbs>` to pages that sit below another page (see the
+  README, "Look and feel"). Pages without one show their title in the top bar, as before.
+  The admin edit pages have them now, and their "Back to …" buttons are gone.
+- `<main>` padding is `py-6` (was `py-8`).
+- Optional: copy `app/src/tests/Feature/LayoutTest.php`.
+
 ## 2026-10 — Trusted proxies
 
 `X-Forwarded-*` headers from the reverse proxy are now trusted, controlled by

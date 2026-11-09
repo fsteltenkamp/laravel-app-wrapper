@@ -12,6 +12,9 @@ class Team extends Model
 {
     use HasRoles;
 
+    /** Spatie derives the guard from the model, which only works for authenticatables. */
+    protected string $guard_name = 'web';
+
     /**
      * Users that belong to this team.
      *

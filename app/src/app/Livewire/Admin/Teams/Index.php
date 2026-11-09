@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Teams;
 
 use App\Livewire\Concerns\ShowsToasts;
 use App\Models\Team;
+use App\Notifications\Notifier;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -35,7 +36,9 @@ class Index extends Component
             'newName' => ['required', 'string', 'max:255'],
         ]);
 
-        Team::create(['name' => $this->newName]);
+        $team = Team::create(['name' => $this->newName]);
+
+        app(Notifier::class)->send('team.created', __(':name was added.', ['name' => $team->name]), route('admin.teams.edit', $team));
 
         $this->toast(__('Team created.'));
         $this->dispatch('close-modal', name: 'team-form');
@@ -55,7 +58,10 @@ class Index extends Component
     public function deleteTeam(): void
     {
         $team = Team::find($this->confirmingDeleteId);
-        $team?->delete();
+
+        if ($team?->delete()) {
+            app(Notifier::class)->send('team.deleted', __(':name was removed.', ['name' => $team->name]));
+        }
 
         $this->toast(__('Team deleted.'));
 

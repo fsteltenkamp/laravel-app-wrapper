@@ -1,3 +1,10 @@
+{{-- Layout slot: Livewire passes top-level slots of a page component to the layout. --}}
+<x-slot:breadcrumbs>
+    <x-fltc::nav.breadcrumbs.item icon="ph ph-users">{{ __('User management') }}</x-fltc::nav.breadcrumbs.item>
+    <x-fltc::nav.breadcrumbs.item :href="route('admin.roles.index')" icon="ph ph-users-three">{{ __('Roles') }}</x-fltc::nav.breadcrumbs.item>
+    <x-fltc::nav.breadcrumbs.item :is-active="true">{{ $role->name }}</x-fltc::nav.breadcrumbs.item>
+</x-slot:breadcrumbs>
+
 <section class="w-full">
     @include('partials.admin-heading')
 
@@ -6,9 +13,6 @@
             <x-fltc::heading level="2" size="xl">{{ $role->name }}</x-fltc::heading>
             <x-fltc::subheading>{{ $role->permissions()->count() }} {{ __('permissions') }}</x-fltc::subheading>
         </div>
-        <x-fltc::button.link variant="outline" height="sm" icon="arrow-left" :href="route('admin.roles.index')" navigate>
-            {{ __('Back to roles') }}
-        </x-fltc::button.link>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-2">

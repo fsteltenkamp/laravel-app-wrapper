@@ -7,6 +7,7 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
@@ -135,10 +136,30 @@ class TeamEditTest extends TestCase
         $this->assertContains($userB->id, $memberIds);
     }
 
-    // NOTE: Team role and permission assignment tests are omitted because
-    // the Team model has no Authenticatable guard, causing Spatie Permission
-    // to resolve guard '' for it — which mismatches the 'web' guard used for
-    // roles and permissions. The saveRoles() / savePermissions() methods on
-    // TeamEdit will throw a GuardDoesNotMatch exception until the Team model
-    // is given an explicit `protected $guard_name = 'web'` property.
+    public function test_admin_can_assign_roles_to_team(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $team = Team::create(['name' => 'Engineering']);
+        Role::create(['name' => 'Support']);
+
+        Livewire::test(Edit::class, ['team' => $team])
+            ->set('selectedRoles', ['Support'])
+            ->call('saveRoles')
+            ->assertHasNoErrors();
+
+        $this->assertTrue($team->fresh()->hasRole('Support'));
+    }
+
+    public function test_admin_can_assign_direct_permissions_to_team(): void
+    {
+        $this->actingAs(User::factory()->create());
+        $team = Team::create(['name' => 'Engineering']);
+
+        Livewire::test(Edit::class, ['team' => $team])
+            ->set('selectedPermissions', ['user.edit'])
+            ->call('savePermissions')
+            ->assertHasNoErrors();
+
+        $this->assertTrue($team->fresh()->hasDirectPermission('user.edit'));
+    }
 }
