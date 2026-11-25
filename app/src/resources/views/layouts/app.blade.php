@@ -7,14 +7,10 @@
         <div class="flex min-h-screen">
             {{--
                 From lg up the sidebar is a pinned column; users can hide it and open it over the
-                content from the top bar instead (partials/sidebar-state.blade.php, app.css).
-                Below lg it is fltc's drawer. The brand row matches the slim top bar (h-12).
+                content from the top bar instead, kept per browser under `app-sidebar`.
+                Below lg it is fltc's drawer. The brand row matches the slim top bar.
             --}}
-            <x-fltc::nav.sidebar
-                class="app-sidebar lg:sticky lg:top-0 [&>div:first-of-type]:h-12"
-                x-bind:data-open="open"
-                x-on:click.outside="$event.target.closest('.app-sidebar-toggle') || hide()"
-            >
+            <x-fltc::nav.sidebar pinnable persist="app-sidebar" header-height="sm" class="lg:sticky lg:top-0">
                 <x-slot:brand>
                     <a href="{{ route('dashboard') }}" wire:navigate class="flex min-w-0 items-center gap-2 font-semibold tracking-tight">
                         <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary-600 text-white">
@@ -22,15 +18,6 @@
                         </span>
                         <span class="truncate">{{ config('app.name') }}</span>
                     </a>
-
-                    <button type="button" data-sidebar-when="pinned" x-on:click="appSidebar.collapse()" title="{{ __('Hide sidebar') }}" aria-label="{{ __('Hide sidebar') }}"
-                        class="ml-auto hidden cursor-pointer rounded-md p-1.5 text-base-500 hover:bg-base-100 hover:text-base-900 dark:text-base-400 dark:hover:bg-base-800 dark:hover:text-base-100">
-                        <x-fltc::icon name="sidebar-simple" />
-                    </button>
-                    <button type="button" data-sidebar-when="collapsed" x-on:click="appSidebar.pin(); hide()" title="{{ __('Pin sidebar') }}" aria-label="{{ __('Pin sidebar') }}"
-                        class="ml-auto hidden cursor-pointer rounded-md p-1.5 text-base-500 hover:bg-base-100 hover:text-base-900 dark:text-base-400 dark:hover:bg-base-800 dark:hover:text-base-100">
-                        <x-fltc::icon name="push-pin" />
-                    </button>
                 </x-slot:brand>
 
                 <x-fltc::nav.sidebar.link :href="route('dashboard')" icon="ph ph-squares-four" wire:navigate>{{ __('Dashboard') }}</x-fltc::nav.sidebar.link>
@@ -55,13 +42,12 @@
             </x-fltc::nav.sidebar>
 
             <div class="flex min-w-0 flex-1 flex-col">
-                {{-- Slim top bar: fltc's navbar row is fixed at h-16, lowered to h-12 here. --}}
-                <x-fltc::nav.navbar stickyTop class="[&>div>div]:h-12">
+                <x-fltc::nav.navbar stickyTop height="sm">
                     <x-slot:left>
-                        <x-fltc::nav.navbar.toggle class="app-sidebar-toggle" />
+                        <x-fltc::nav.navbar.toggle pinnable />
                         @isset($breadcrumbs)
                             {{-- One line; scrolls sideways on narrow screens instead of wrapping. --}}
-                            <x-fltc::nav.breadcrumbs container-class="min-w-0" class="flex min-w-0 items-center [&_li]:shrink-0 [&_ol]:flex-nowrap [&_ol]:overflow-x-auto [&_ol]:[scrollbar-width:none]">
+                            <x-fltc::nav.breadcrumbs scroll container-class="min-w-0" class="flex min-w-0 items-center">
                                 {{ $breadcrumbs }}
                             </x-fltc::nav.breadcrumbs>
                         @elseif (filled($title ?? null))

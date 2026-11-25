@@ -1,10 +1,12 @@
 @import 'tailwindcss';
 @import 'icons.css';
 
-/* fltc: role colours (bg-primary-500, text-base-900, …), the themes that fill them, and the skins. */
+/* fltc: role colours (bg-primary-500, text-base-900, …), the themes that fill them, the skins,
+   and base rules ([x-cloak], the base role's faint shade as the default line colour). */
 @import '../../vendor/fsteltenkamp/laravel-twcss-components/resources/css/colors.css';
 @import '../../vendor/fsteltenkamp/laravel-twcss-components/resources/css/themes.css';
 @import '../../vendor/fsteltenkamp/laravel-twcss-components/resources/css/skin-effects.css';
+@import '../../vendor/fsteltenkamp/laravel-twcss-components/resources/css/base.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -14,52 +16,6 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Alpine: hide elements until Alpine initializes. */
-[x-cloak] {
-    display: none !important;
-}
-
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-}
-
-@layer base {
-
-    *,
-    ::after,
-    ::before,
-    ::backdrop,
-    ::file-selector-button {
-        border-color: var(--color-base-200, currentColor);
-    }
-}
-
-/*
- * Sidebar pinned or hidden (from lg up; resources/views/partials/sidebar-state.blade.php).
- * Below lg, fltc's drawer applies unchanged. Hidden, the sidebar leaves the layout and the
- * top bar's toggle slides it in over the content, as on small screens. Unlayered, so these
- * beat the sidebar's own lg: utilities.
- */
-@media (width >= 64rem) {
-    html:not([data-sidebar="collapsed"]) [data-sidebar-when="pinned"],
-    html[data-sidebar="collapsed"] [data-sidebar-when="collapsed"] {
-        display: inline-flex;
-    }
-
-    html[data-sidebar="collapsed"] .app-sidebar {
-        position: fixed;
-        inset-block: 0;
-        left: 0;
-        z-index: 50;
-        translate: -100% 0;
-    }
-
-    html[data-sidebar="collapsed"] .app-sidebar[data-open] {
-        translate: 0 0;
-        box-shadow: var(--shadow-2xl);
-    }
-
-    html[data-sidebar="collapsed"] .app-sidebar-toggle {
-        display: inline-flex;
-    }
 }
