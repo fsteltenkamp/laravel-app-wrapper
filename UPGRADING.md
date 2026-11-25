@@ -3,6 +3,43 @@
 Each section lists what changed in the template and what an app built from it has to do.
 Newest first.
 
+## 2026-11 — fltc update: renamed skins, built-in pinnable sidebar
+
+fltc (`bbe2719`) renamed three skins and themes, and now ships the hideable sidebar, slim
+navbar, scrolling breadcrumbs and page header the template used to build by hand. See the
+fltc README and `wiki/components.md` for the new components (list, disclosure, description
+list, avatar, thread, code, lightbox, frame, QR, time, markdown editor, date range, radio
+cards, …).
+
+- `composer update fsteltenkamp/laravel-twcss-components`, then rebuild the assets.
+- **Skins and themes renamed**: `cyberpunk` → `neon`, `fantasy` → `parchment`, `wh40k` →
+  `gothic`.
+  - Copy `database/migrations/2026_11_25_000000_rename_fltc_skins_and_themes_on_users_table.php`
+    and migrate, so users keep their look (reversible).
+  - `config/appearance.php`: rename them in `skins` and `themes`.
+  - Change `APP_SKIN` / `APP_THEME` in your deployment's env if they use an old name.
+  - Rename them in your own `data-skin` / `data-theme` attributes and tests.
+- **Sidebar**: the layout now uses fltc's own pinnable sidebar instead of the template's.
+  - `layouts/app.blade.php`: on `x-fltc::nav.sidebar` set
+    `pinnable persist="app-sidebar" header-height="sm"` and remove the `app-sidebar` class,
+    `x-bind:data-open`, `x-on:click.outside` and `[&>div:first-of-type]:h-12`. Remove the
+    two `data-sidebar-when` buttons from the brand slot (fltc adds them).
+    `persist="app-sidebar"` keeps the state users already saved.
+  - Navbar: `height="sm"` instead of `class="[&>div>div]:h-12"`; toggle: `pinnable` instead
+    of `class="app-sidebar-toggle"`; breadcrumbs: `scroll` instead of the `[&_ol]:…` classes.
+  - Delete `partials/sidebar-state.blade.php` and its `@include` in `partials/head.blade.php`.
+  - `window.appSidebar.pin()` / `.collapse()` is now `window.fltcSidebar.pin()` / `.collapse()`.
+- `resources/css/app.css`: import fltc's `base.css` and remove the template's `[x-cloak]`
+  rule, the `@layer base` border colour and the "Sidebar pinned or hidden" block. Lines
+  without a colour now take `base-700` in dark mode (was `base-200`).
+- Optional, the template's views now use the new components:
+  - `x-fltc::page-header` for the dashboard, settings and admin headings
+    (`partials/*-heading.blade.php`) and the titles of the admin edit pages.
+  - `x-fltc::qr` for the two-factor QR code and `x-fltc::code` for the manual setup key
+    (copy button with a toast) in `livewire/settings/security.blade.php`.
+  - `<x-fltc::code inline>` for permission keys in the admin views.
+- Optional: copy `tests/Feature/LayoutTest.php` and `tests/Feature/Settings/AppearanceTest.php`.
+
 ## 2026-11 — Team permissions apply to members
 
 Permissions and roles given to a team now count for its members in `can()`, `@can` and

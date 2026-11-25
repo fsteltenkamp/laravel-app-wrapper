@@ -8,8 +8,7 @@
 @endphp
 
 <div class="relative mb-6 w-full">
-    <x-fltc::heading size="2xl" level="1">{{ __('User management') }}</x-fltc::heading>
-    <x-fltc::subheading size="lg" class="mb-4">{{ __('Manage users, permission groups, permissions and teams') }}</x-fltc::subheading>
+    <x-fltc::page-header size="2xl" :title="__('User management')" :description="__('Manage users, permission groups, permissions and teams')" />
 
     <x-fltc::tabs color="primary" aria-label="{{ __('User management') }}">
         <x-slot:list>

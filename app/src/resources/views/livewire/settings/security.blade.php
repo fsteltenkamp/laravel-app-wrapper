@@ -137,19 +137,7 @@
                         @enderror
 
                         <div class="flex justify-center">
-                            <div class="relative w-64 overflow-hidden border rounded-lg border-base-200 dark:border-base-700 aspect-square">
-                                @empty($qrCodeSvg)
-                                    <div class="absolute inset-0 flex items-center justify-center bg-white dark:bg-base-700 animate-pulse">
-                                        <x-fltc::spinner size="xl" />
-                                    </div>
-                                @else
-                                    <div class="flex items-center justify-center h-full p-4">
-                                        <div class="bg-white p-3 rounded">
-                                            {!! $qrCodeSvg !!}
-                                        </div>
-                                    </div>
-                                @endempty
-                            </div>
+                            <x-fltc::qr size="lg" :label="__('QR code for your authenticator app')">{!! $qrCodeSvg !!}</x-fltc::qr>
                         </div>
 
                         <div>
@@ -171,45 +159,13 @@
                                 </span>
                             </div>
 
-                            <div
-                                class="flex items-center space-x-2"
-                                x-data="{
-                                    copied: false,
-                                    async copy() {
-                                        try {
-                                            await navigator.clipboard.writeText('{{ $manualSetupKey }}');
-                                            this.copied = true;
-                                            setTimeout(() => this.copied = false, 1500);
-                                        } catch (e) {
-                                            console.warn('Could not copy to clipboard');
-                                        }
-                                    }
-                                }"
-                            >
-                                <div class="flex items-stretch w-full border rounded-xl dark:border-base-700">
-                                    @empty($manualSetupKey)
-                                        <div class="flex items-center justify-center w-full p-3 bg-base-100 dark:bg-base-700">
-                                            <x-fltc::spinner size="sm" />
-                                        </div>
-                                    @else
-                                        <input
-                                            type="text"
-                                            readonly
-                                            value="{{ $manualSetupKey }}"
-                                            class="w-full p-3 bg-transparent outline-none text-base-900 dark:text-base-100"
-                                        />
-
-                                        <button
-                                            type="button"
-                                            @click="copy()"
-                                            class="px-3 transition-colors border-l cursor-pointer border-base-200 dark:border-base-600"
-                                        >
-                                            <x-fltc::icon name="copy" variant="regular" x-show="!copied" />
-                                            <x-fltc::icon name="check" x-show="copied" x-cloak class="text-success-500" />
-                                        </button>
-                                    @endempty
+                            @empty($manualSetupKey)
+                                <div class="flex justify-center p-3">
+                                    <x-fltc::spinner size="sm" />
                                 </div>
-                            </div>
+                            @else
+                                <x-fltc::code :value="$manualSetupKey" />
+                            @endempty
                         </div>
                     @endif
                 </div>

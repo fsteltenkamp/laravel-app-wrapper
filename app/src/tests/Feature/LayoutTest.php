@@ -16,10 +16,10 @@ class LayoutTest extends TestCase
 
         $this->get(route('dashboard'))
             ->assertOk()
-            ->assertSee('app-sidebar', false)
-            ->assertSee('data-sidebar-when="pinned"', false)
-            ->assertSee('data-sidebar-when="collapsed"', false)
-            ->assertSee('window.appSidebar', false)
+            ->assertSee('window.fltcSidebar', false)
+            ->assertSee("})('app-sidebar')", false)
+            ->assertSee('fltc-nav-sidebar-pin', false)
+            ->assertSee('lg:[[data-sidebar=collapsed]_&]:inline-flex', false)
             ->assertDontSee('fixed inset-x-0 bottom-0', false);
     }
 

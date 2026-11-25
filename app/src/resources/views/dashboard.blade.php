@@ -1,8 +1,5 @@
 <x-layouts::app :title="__('Dashboard')">
-    <div class="mb-6">
-        <x-fltc::heading size="2xl" level="1">{{ __('Dashboard') }}</x-fltc::heading>
-        <x-fltc::subheading size="lg">{{ __('Welcome back, :name.', ['name' => auth()->user()->name]) }}</x-fltc::subheading>
-    </div>
+    <x-fltc::page-header size="2xl" :title="__('Dashboard')" :description="__('Welcome back, :name.', ['name' => auth()->user()->name])" />
 
     @canany(['user.create', 'user.edit', 'user.delete'])
         <div class="mb-6 grid gap-4 md:grid-cols-3">

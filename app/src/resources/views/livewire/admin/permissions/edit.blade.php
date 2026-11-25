@@ -8,14 +8,9 @@
 <section class="w-full">
     @include('partials.admin-heading')
 
-    <div class="mb-6 flex items-center justify-between gap-4">
-        <div>
-            <x-fltc::heading level="2" size="xl">{{ $permission->label ?: $permission->name }}</x-fltc::heading>
-            <x-fltc::subheading>
-                <code class="rounded bg-base-100 px-1.5 py-0.5 text-xs text-base-700 dark:bg-base-800 dark:text-base-300">{{ $permission->name }}</code>
-            </x-fltc::subheading>
-        </div>
-    </div>
+    <x-fltc::page-header :level="2" :title="$permission->label ?: $permission->name">
+        <x-fltc::code inline class="text-xs" :value="$permission->name" />
+    </x-fltc::page-header>
 
     <div>
         <x-fltc::card>
