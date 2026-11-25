@@ -26,8 +26,8 @@ return [
     |
     */
 
-    'skins' => ['default', 'cyberpunk', 'fantasy', 'wh40k'],
+    'skins' => ['default', 'neon', 'parchment', 'gothic'],
 
-    'themes' => ['default', 'dracula', 'nord', 'catppuccin', 'solarized', 'gruvbox', 'cyberpunk', 'fantasy', 'wh40k', 'custom'],
+    'themes' => ['default', 'dracula', 'nord', 'catppuccin', 'solarized', 'gruvbox', 'neon', 'parchment', 'gothic', 'custom'],
 
 ];

@@ -741,12 +741,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fsteltenkamp/laravel-twcss-components.git",
-                "reference": "56f4129b5e676fdd4f0a523eb8035e3448a09015"
+                "reference": "bbe27196236e856af3de70bfc1a7d55db909d59c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fsteltenkamp/laravel-twcss-components/zipball/56f4129b5e676fdd4f0a523eb8035e3448a09015",
-                "reference": "56f4129b5e676fdd4f0a523eb8035e3448a09015",
+                "url": "https://api.github.com/repos/fsteltenkamp/laravel-twcss-components/zipball/bbe27196236e856af3de70bfc1a7d55db909d59c",
+                "reference": "bbe27196236e856af3de70bfc1a7d55db909d59c",
                 "shasum": ""
             },
             "require": {
@@ -795,7 +795,7 @@
                 "source": "https://github.com/fsteltenkamp/laravel-twcss-components/tree/main",
                 "issues": "https://github.com/fsteltenkamp/laravel-twcss-components/issues"
             },
-            "time": "2026-10-13T21:45:36+00:00"
+            "time": "2026-11-25T16:51:26+00:00"
         },
         {
             "name": "graham-campbell/result-type",
@@ -10794,5 +10794,5 @@
         "php": "^8.5"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.11.0"
 }

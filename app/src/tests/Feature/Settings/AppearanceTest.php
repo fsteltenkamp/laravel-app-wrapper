@@ -28,10 +28,10 @@ class AppearanceTest extends TestCase
         $this->actingAs($user);
 
         Livewire::test(Appearance::class)
-            ->call('saveSkin', 'cyberpunk')
+            ->call('saveSkin', 'neon')
             ->assertHasNoErrors();
 
-        $this->assertSame('cyberpunk', $user->refresh()->skin);
+        $this->assertSame('neon', $user->refresh()->skin);
     }
 
     public function test_unknown_skin_is_rejected(): void
@@ -83,7 +83,7 @@ class AppearanceTest extends TestCase
     public function test_saved_appearance_is_applied_on_every_page(): void
     {
         $user = User::factory()->create([
-            'skin' => 'fantasy',
+            'skin' => 'parchment',
             'theme' => 'custom',
             'theme_colors' => ['primary' => 'rose'],
         ]);
@@ -91,19 +91,35 @@ class AppearanceTest extends TestCase
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
-            ->assertSee("localStorage.setItem('fltc-skin', 'fantasy')", false)
+            ->assertSee("localStorage.setItem('fltc-skin', 'parchment')", false)
             ->assertSee("localStorage.setItem('fltc-theme', 'custom')", false)
             ->assertSee('primary', false);
     }
 
     public function test_guests_get_the_configured_default_look(): void
     {
-        config(['appearance.skin' => 'wh40k']);
+        config(['appearance.skin' => 'gothic']);
 
         $this->get(route('login'))
             ->assertOk()
             ->assertDontSee("localStorage.setItem('fltc-skin'", false)
             ->assertSee("localStorage.removeItem('fltc-skin')", false)
-            ->assertSee("skin: 'wh40k'", false);
+            ->assertSee("skin: 'gothic'", false);
+    }
+
+    public function test_renamed_skins_and_themes_are_migrated(): void
+    {
+        $user = User::factory()->create(['skin' => 'cyberpunk', 'theme' => 'wh40k']);
+        $other = User::factory()->create(['skin' => 'default', 'theme' => 'nord']);
+
+        $migration = require database_path('migrations/2026_11_25_000000_rename_fltc_skins_and_themes_on_users_table.php');
+        $migration->up();
+
+        $this->assertSame(['neon', 'gothic'], [$user->refresh()->skin, $user->theme]);
+        $this->assertSame(['default', 'nord'], [$other->refresh()->skin, $other->theme]);
+
+        $migration->down();
+
+        $this->assertSame(['cyberpunk', 'wh40k'], [$user->refresh()->skin, $user->theme]);
     }
 }
