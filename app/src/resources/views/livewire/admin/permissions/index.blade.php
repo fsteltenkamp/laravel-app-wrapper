@@ -30,7 +30,7 @@
                 <x-fltc::table.row wire:key="perm-{{ $permission->id }}">
                     <x-fltc::table.cell nowrap class="font-medium">{{ $permission->label }}</x-fltc::table.cell>
                     <x-fltc::table.cell>
-                        <code class="rounded bg-base-100 px-1.5 py-0.5 text-xs text-base-700 dark:bg-base-800 dark:text-base-300">{{ $permission->name }}</code>
+                        <x-fltc::code inline class="text-xs" :value="$permission->name" />
                     </x-fltc::table.cell>
                     <x-fltc::table.cell>
                         <x-fltc::badge>{{ $permission->roles_count }}</x-fltc::badge>

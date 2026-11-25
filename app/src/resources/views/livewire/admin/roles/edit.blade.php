@@ -8,12 +8,7 @@
 <section class="w-full">
     @include('partials.admin-heading')
 
-    <div class="mb-6 flex items-center justify-between gap-4">
-        <div>
-            <x-fltc::heading level="2" size="xl">{{ $role->name }}</x-fltc::heading>
-            <x-fltc::subheading>{{ $role->permissions()->count() }} {{ __('permissions') }}</x-fltc::subheading>
-        </div>
-    </div>
+    <x-fltc::page-header :level="2" :title="$role->name" :description="$role->permissions()->count().' '.__('permissions')" />
 
     <div class="grid gap-6 lg:grid-cols-2">
         {{-- Name --}}

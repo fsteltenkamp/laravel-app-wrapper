@@ -8,12 +8,7 @@
 <section class="w-full">
     @include('partials.admin-heading')
 
-    <div class="mb-6 flex items-center justify-between gap-4">
-        <div>
-            <x-fltc::heading level="2" size="xl">{{ $user->name }}</x-fltc::heading>
-            <x-fltc::subheading>{{ $user->email }}</x-fltc::subheading>
-        </div>
-    </div>
+    <x-fltc::page-header :level="2" :title="$user->name" :description="$user->email" />
 
     <div class="grid gap-6 lg:grid-cols-2">
         {{-- Profile --}}
